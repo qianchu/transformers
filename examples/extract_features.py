@@ -284,7 +284,7 @@ def tokenid2wordid(input_ids,tokenizer,examples):
             # w_ids = tokenizer.batch_encode_plus([w.encode('utf-8')], return_attention_masks=True,
             #                                      add_special_tokens=True)['input_ids'][0]
 
-            w_ids=w_ids[1:-1]
+            # w_ids=w_ids[1:-1]
 
 
             if len(w_ids)==0:
