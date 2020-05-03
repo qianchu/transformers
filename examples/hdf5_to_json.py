@@ -11,7 +11,7 @@ if __name__=='__main__':
     np_dict={}
     for key in f:
         np_dict[key]=f[key][:]
-        print (key)
+        # print (key)
     f.close()
 
     np.save(output_npy,np_dict)
