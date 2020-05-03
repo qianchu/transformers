@@ -279,9 +279,10 @@ def tokenid2wordid(input_ids,tokenizer,examples):
         w2token=[]
         input_id=input_ids[i]
         input_start=0
-        for w in example.split():
-            w_ids = tokenizer.batch_encode_plus([w], return_attention_masks=True,
-                                                 add_special_tokens=True)['input_ids'][0]
+        for w in example.split(' '):
+            w_ids=tokenizer.encode(w,add_special_tokens=True)
+            # w_ids = tokenizer.batch_encode_plus([w.encode('utf-8')], return_attention_masks=True,
+            #                                      add_special_tokens=True)['input_ids'][0]
 
             w_ids=w_ids[1:-1]
 
