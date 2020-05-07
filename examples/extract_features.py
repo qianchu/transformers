@@ -49,6 +49,7 @@ MODELS=[BERT_BASE_CASED,BERT_BASE_UNCASED,ROBERTA_LARGE_CASED,BERT_LARGE_CASED,X
 
 MODELNAME2MODEL={BERT_BASE_CASED:BertModel,BERT_LARGE_CASED_WHOLEWORD:BertModel,BERT_BASE_UNCASED:BertModel,BERT_LARGE_CASED:BertModel,ROBERTA_LARGE_CASED:RobertaModel,XLNET_LARGE:XLNetModel,T5:T5Model,XLM:XLMModel}
 MODELNAME2TOKENIZERS={BERT_BASE_CASED:BertTokenizer,BERT_LARGE_CASED_WHOLEWORD:BertTokenizer,BERT_BASE_UNCASED:BertTokenizer,BERT_LARGE_CASED:BertTokenizer, ROBERTA_LARGE_CASED:RobertaTokenizer,XLNET_LARGE:XLNetTokenizer,T5:T5Tokenizer,XLM:XLMTokenizer}
+EOS_NUM=1
 
 
 def produce_key(sent):
@@ -287,12 +288,11 @@ def tokenid2wordid(input_ids,tokenizer,examples):
 
             # w_ids=w_ids[1:-1]
 
-
             if len(w_ids)==0:
                 print (w_ids)
                 continue
-
-            if input_start+len(w_ids) >= len(input_id):
+            
+            if input_start+len(w_ids)+EOS_NUM >= len(input_id):
                 break
             while int(w_ids[0])!=int(input_id[input_start]):
                 input_start+=1
@@ -479,6 +479,8 @@ def main():
 
     # layer_indexes = [int(x) for x in args.layers.split(",")]
     assert args.model in MODELS
+    if args.model ==XLNET_LARGE:
+        EOS_NUM=2
     tokenizer = MODELNAME2TOKENIZERS[args.model].from_pretrained(args.model,output_hidden_states=True,output_attentions=True)
     model = MODELNAME2MODEL[args.model].from_pretrained(args.model,output_hidden_states=True,output_attentions=True)
     model.to(device)
@@ -498,3 +500,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
