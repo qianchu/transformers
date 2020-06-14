@@ -292,7 +292,7 @@ def tokenid2wordid(input_ids,tokenizer,examples):
                 print (w_ids)
                 continue
             
-            if input_start+len(w_ids)+EOS_NUM >= len(input_id):
+            if input_start+len(w_ids)+EOS_NUM > len(input_id):
                 break
             while int(w_ids[0])!=int(input_id[input_start]):
                 input_start+=1
