@@ -461,7 +461,7 @@ def main():
     parser.add_argument('--lg',type=str,default='',help='language id')
     parser.add_argument('--model_type', type=str,default=None,help='model type')
     
-
+    import os
     args = parser.parse_args()
     if not args.model_type:
         args.model_type=args.model
@@ -469,7 +469,11 @@ def main():
     if args.output_file:
         writer= h5py.File(args.output_file, 'w')
     else:
-        writer=h5py.File(args.input_file+'.'+args.model_type+'.ly-'+str(args.layers)+'.hdf5','w')
+        model_pre=args.model_type
+        if args.model_type!=args.model:
+            model_pre+='_'+os.path.basename(os.path.dirname(args.model))
+        
+        writer=h5py.File(args.input_file+'.'+model_pre+'.ly-'+str(args.layers)+'.hdf5','w')
 
     if args.local_rank == -1 or args.no_cuda:
         device = torch.device("cuda:{0}".format(args.gpu) if torch.cuda.is_available() and not args.no_cuda and args.gpu>=0 else "cpu")
