@@ -38,6 +38,7 @@ logger = logging.getLogger(__name__)
 import h5py
 
 BERT_BASE_CASED='bert-base-cased'
+BERT='bert'
 BERT_BASE_UNCASED='bert-base-uncased'
 BERT_LARGE_CASED='bert-large-cased'
 BERT_LARGE_CASED_WHOLEWORD='bert-large-cased-whole-word-masking'
@@ -45,10 +46,10 @@ ROBERTA_LARGE_CASED='roberta-large'
 XLNET_LARGE='xlnet-large-cased'
 T5='t5-large'
 XLM='xlm-mlm-tlm-xnli15-1024'
-MODELS=[BERT_BASE_CASED,BERT_BASE_UNCASED,ROBERTA_LARGE_CASED,BERT_LARGE_CASED,XLNET_LARGE,T5,XLM,BERT_LARGE_CASED_WHOLEWORD]
+MODELS=[BERT,BERT_BASE_CASED,BERT_BASE_UNCASED,ROBERTA_LARGE_CASED,BERT_LARGE_CASED,XLNET_LARGE,T5,XLM,BERT_LARGE_CASED_WHOLEWORD]
 
-MODELNAME2MODEL={BERT_BASE_CASED:BertModel,BERT_LARGE_CASED_WHOLEWORD:BertModel,BERT_BASE_UNCASED:BertModel,BERT_LARGE_CASED:BertModel,ROBERTA_LARGE_CASED:RobertaModel,XLNET_LARGE:XLNetModel,T5:T5Model,XLM:XLMModel}
-MODELNAME2TOKENIZERS={BERT_BASE_CASED:BertTokenizer,BERT_LARGE_CASED_WHOLEWORD:BertTokenizer,BERT_BASE_UNCASED:BertTokenizer,BERT_LARGE_CASED:BertTokenizer, ROBERTA_LARGE_CASED:RobertaTokenizer,XLNET_LARGE:XLNetTokenizer,T5:T5Tokenizer,XLM:XLMTokenizer}
+MODELNAME2MODEL={BERT:BertModel,BERT_BASE_CASED:BertModel,BERT_LARGE_CASED_WHOLEWORD:BertModel,BERT_BASE_UNCASED:BertModel,BERT_LARGE_CASED:BertModel,ROBERTA_LARGE_CASED:RobertaModel,XLNET_LARGE:XLNetModel,T5:T5Model,XLM:XLMModel}
+MODELNAME2TOKENIZERS={BERT:BertModel,BERT_BASE_CASED:BertTokenizer,BERT_LARGE_CASED_WHOLEWORD:BertTokenizer,BERT_BASE_UNCASED:BertTokenizer,BERT_LARGE_CASED:BertTokenizer, ROBERTA_LARGE_CASED:RobertaTokenizer,XLNET_LARGE:XLNetTokenizer,T5:T5Tokenizer,XLM:XLMTokenizer}
 EOS_NUM=1
 
 
@@ -458,8 +459,12 @@ def main():
                         help="Whether not to use CUDA when available")
     parser.add_argument('--gpu', type=int,help='specify the gpu to use')
     parser.add_argument('--lg',type=str,default='',help='language id')
+    parser.add_argument('--model_type', type=str,default=None,help='model type')
+    
 
     args = parser.parse_args()
+    if not args.model_type:
+        args.model_type=args.model
 
     if args.output_file:
         writer= h5py.File(args.output_file, 'w')
@@ -481,8 +486,8 @@ def main():
     assert args.model in MODELS
     if args.model ==XLNET_LARGE:
         EOS_NUM=2
-    tokenizer = MODELNAME2TOKENIZERS[args.model].from_pretrained(args.model,output_hidden_states=True,output_attentions=True)
-    model = MODELNAME2MODEL[args.model].from_pretrained(args.model,output_hidden_states=True,output_attentions=True)
+    tokenizer = MODELNAME2TOKENIZERS[args.model_type].from_pretrained(args.model,output_hidden_states=True,output_attentions=True)
+    model = MODELNAME2MODEL[args.model_type].from_pretrained(args.model,output_hidden_states=True,output_attentions=True)
     model.to(device)
 
     if args.local_rank != -1:
