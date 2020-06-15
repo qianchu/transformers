@@ -483,7 +483,7 @@ def main():
     logger.info("device: {} n_gpu: {} distributed training: {}".format(device, n_gpu, bool(args.local_rank != -1)))
 
     # layer_indexes = [int(x) for x in args.layers.split(",")]
-    assert args.model in MODELS
+    assert args.model_type in MODELS
     if args.model ==XLNET_LARGE:
         EOS_NUM=2
     tokenizer = MODELNAME2TOKENIZERS[args.model_type].from_pretrained(args.model,output_hidden_states=True,output_attentions=True)
