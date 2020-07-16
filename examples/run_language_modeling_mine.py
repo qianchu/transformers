@@ -333,7 +333,9 @@ def translate_label(trans_dict,labels,inputs):
                     logger.info("replace {0} {1} with {2} {3}".format(str(l),tokenizer.id_to_token(l),str(l_trans_token),tokenizer.id_to_token(l_trans_token)))
                     continue
             new_label.append(l)
+        assert len(new_label)==len(label)
         newlabels.append(new_label)
+    assert len(newlabels)==len(labels)
     return torch.tensor(newlabels,dtype=labels.dtype)
 
 def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedTokenizer) -> Tuple[int, float]:
