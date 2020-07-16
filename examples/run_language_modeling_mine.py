@@ -36,6 +36,8 @@ from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import DataLoader, Dataset, RandomSampler, SequentialSampler
 from torch.utils.data.distributed import DistributedSampler
 from tqdm import tqdm, trange
+from collections import defaultdict
+from random import shuffle,sample
 
 from transformers import (
     MODEL_WITH_LM_HEAD_MAPPING,
@@ -301,16 +303,37 @@ def create_posids(batch):
 
     return pos_ids
 
-def translate_label(trans_dict,labels):
+def find_trans(l_i,l,trans_dict,input_per_examp):
+    assert input_per_examp[l_i]==l
+    l_candidates=trans_dict[l]
+    shuffle(l_candidates)
+    for l_candi in l_candidates:
+        l_candi_i=l_candi.index(l)
+        start=l_i-l_candi_i
+        end=l_i+(len(l_candi)-l_candi_i)
+        if input_per_examp[start:end]==l_candi:
+            l_trans=sample(l_candidates[l_candi],1)[0]
+            l_trans_token=sample(l_trans,1)
+            return l_trans_token
+
+
+
+
+def translate_label(trans_dict,labels,inputs):
     newlabels=[]
-    for label in labels:
+    for i,label in enumerate(labels):
+        input_per_examp=inputs[i]
         new_label=[]
-        for l in label:
+        for l_i,l in enumerate(label):
             if l in trans_dict:
-               new_label.append(trans_dict[l])
-            else:
-                new_label.append(l)
-            newlabels.append(new_label)
+                l_candidates=trans_dict[l]
+                l_trans_token=find_trans(l_i,l,trans_dict,input_per_examp)
+                if l_trans_token:
+                    new_label.append(l_trans_token)
+                    logger.info("replace {0} {1} with {2} {3}".format(str(l),tokenizer.id_to_token(l),str(l_trans_token),tokenizer.id_to_token(l_trans_token)))
+                    continue
+            new_label.append(l)
+        newlabels.append(new_label)
     return torch.tensor(newlabels,dtype=labels.dtype)
 
 def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedTokenizer) -> Tuple[int, float]:
@@ -449,7 +472,11 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
 
             loss = outputs[0]  # model outputs are always tuple in transformers (see doc)
             if args.dict:
-                trans_labels=translate_label(args.dict,labels)
+                trans_labels=translate_label(args.dict,labels,inputs)
+                outputs = model(inputs, attention_mask=attention_mask,position_ids=posids,masked_lm_labels=trans_labels) if args.mlm else model(inputs, attention_mask=attention_mask,position_ids=posids,labels=labels)
+                loss2=outputs[0]
+                loss=(loss+loss2)/2
+
             if args.n_gpu > 1:
                 loss = loss.mean()  # mean() to average on multi-gpu parallel training
             if args.gradient_accumulation_steps > 1:
@@ -591,8 +618,30 @@ def evaluate(args, model: PreTrainedModel, tokenizer: PreTrainedTokenizer, prefi
 
     return result
 
+def dict_to_id(dict_f):
+    trans=defaultdict(lambda: defaultdict(list))
+    with open(dict_f,'r',encoding='utf-8') as f:
+        for line in f:
+            w1,w2=line.strip().split()
+            ids1_orig=tokenizer.encode(w1,add_special_tokens=False,add_prefix_space=True)
+            ids2_orig=tokenizer.encode(w2,add_special_tokens=False,add_prefix_space=True)
+            space_i=tokenizer.convert_tokens_to_ids('▁')
+            exclude=list(set(ids1_orig)&set(ids2_orig))+[space_i]
+            ids1=tuple([str(i) for i in ids1_orig if i not in exclude])
+            ids2=tuple([str(i) for i in ids2_orig if i not in exclude])
+            if len(ids1)>0 and len(ids2)>0:
+                # if len(ids1)==1==len(ids2):
+                for id in ids1:
+                    trans[id][ids1].append(ids2)
+                for id in ids2:
+                    trans[id][ids2].append(ids1)
+
+
+    return trans
+                
 
 def main():
+   
     parser = argparse.ArgumentParser()
 
     # Required parameters
@@ -739,9 +788,11 @@ def main():
     parser.add_argument("--local_rank", type=int, default=-1, help="For distributed training: local_rank")
     parser.add_argument("--server_ip", type=str, default="", help="For distant debugging.")
     parser.add_argument("--server_port", type=str, default="", help="For distant debugging.")
-    parser.add_argument('--dict',type=str,help='dictionary file location')
+    parser.add_argument("--dict",type=str,help='dictionary file location')
     args = parser.parse_args()
 
+    if args.dict:
+        args.dict=dict_to_id(args.dict)
     if args.model_type in ["bert", "roberta", "distilbert", "camembert"] and not args.mlm:
         raise ValueError(
             "BERT and RoBERTa-like models do not have LM heads but masked LM heads. They must be run using the --mlm "
