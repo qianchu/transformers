@@ -638,6 +638,7 @@ def dict_to_id(dict_f,tokenizer):
             ids1=tuple([str(i) for i in ids1_orig if i not in exclude])
             ids2=tuple([str(i) for i in ids2_orig if i not in exclude])
             if len(ids1)>0 and len(ids2)>0:
+                logger.info("ids1 {0} ids2 {1}".format(ids1,ids2))
                 # if len(ids1)==1==len(ids2):
                 for id in ids1:
                     trans[id][ids1].append(ids2)
