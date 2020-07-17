@@ -793,8 +793,7 @@ def main():
     parser.add_argument("--dict",type=str,help='dictionary file location')
     args = parser.parse_args()
 
-    if args.dict:
-        args.dict=dict_to_id(args.dict)
+   
     if args.model_type in ["bert", "roberta", "distilbert", "camembert"] and not args.mlm:
         raise ValueError(
             "BERT and RoBERTa-like models do not have LM heads but masked LM heads. They must be run using the --mlm "
@@ -912,6 +911,8 @@ def main():
 
     logger.info("Training/evaluation parameters %s", args)
 
+    if args.dict:
+        args.dict=dict_to_id(args.dict)
     # Training
     if args.do_train:
         if args.local_rank not in [-1, 0]:
