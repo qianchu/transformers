@@ -620,7 +620,7 @@ def evaluate(args, model: PreTrainedModel, tokenizer: PreTrainedTokenizer, prefi
 
     return result
 
-def dict_to_id(dict_f):
+def dict_to_id(dict_f,tokenizer):
     trans=defaultdict(lambda: defaultdict(list))
     with open(dict_f,'r',encoding='utf-8') as f:
         for line in f:
@@ -912,7 +912,7 @@ def main():
     logger.info("Training/evaluation parameters %s", args)
 
     if args.dict:
-        args.dict=dict_to_id(args.dict)
+        args.dict=dict_to_id(args.dict,tokenizer)
     # Training
     if args.do_train:
         if args.local_rank not in [-1, 0]:
