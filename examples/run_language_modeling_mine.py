@@ -304,14 +304,14 @@ def create_posids(batch):
     return pos_ids
 
 def find_trans(l_i,l,trans_dict,input_per_examp):
-    assert int(input_per_examp[l_i])==int(l)
+    assert input_per_examp[l_i]==l
     l_candidates=trans_dict[l]
     shuffle(l_candidates)
     for l_candi in l_candidates:
         l_candi_i=l_candi.index(l)
         start=l_i-l_candi_i
         end=l_i+(len(l_candi)-l_candi_i)
-        if input_per_examp[start:end]==l_candi:
+        if input_per_examp[start:end]==list(l_candi):
             l_trans=sample(l_candidates[l_candi],1)[0]
             l_trans_token=sample(l_trans,1)
             return l_trans_token
@@ -323,10 +323,10 @@ def translate_label(trans_dict,labels,inputs,tokenizer):
     changed_flag=False
     newlabels=[]
     for i,label in enumerate(labels):
-        input_per_examp=inputs[i]
+        input_per_examp=inputs[i].tolist()
+        logger.info('input',input_per_examp,'label',label)
         new_label=[]
-        for l_i,l in enumerate(label):
-            l=int(l)
+        for l_i,l in enumerate(label.tolist()):
             if l in trans_dict:
                 l_candidates=trans_dict[l]
                 logger.info('found label {0} with candidates {1}'.format(str(l),str(l_candidates.keys())))
