@@ -319,7 +319,8 @@ def find_trans(l_i,l,trans_dict,input_per_examp):
 
 
 
-def translate_label(trans_dict,labels,inputs):
+def translate_label(trans_dict,labels,inputs,tokenizer):
+    changed_flag=False
     newlabels=[]
     for i,label in enumerate(labels):
         input_per_examp=inputs[i]
@@ -330,13 +331,14 @@ def translate_label(trans_dict,labels,inputs):
                 l_trans_token=find_trans(l_i,l,trans_dict,input_per_examp)
                 if l_trans_token:
                     new_label.append(l_trans_token)
+                    changed_flag=True
                     logger.info("replace {0} {1} with {2} {3}".format(str(l),tokenizer.id_to_token(l),str(l_trans_token),tokenizer.id_to_token(l_trans_token)))
                     continue
             new_label.append(l)
         assert len(new_label)==len(label)
         newlabels.append(new_label)
     assert len(newlabels)==len(labels)
-    return torch.tensor(newlabels,dtype=labels.dtype)
+    return torch.tensor(newlabels,dtype=labels.dtype),changed_flag
 
 def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedTokenizer) -> Tuple[int, float]:
     """ Train the model """
@@ -474,10 +476,12 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
 
             loss = outputs[0]  # model outputs are always tuple in transformers (see doc)
             if args.dict:
-                trans_labels=translate_label(args.dict,labels,inputs)
-                outputs = model(inputs, attention_mask=attention_mask,position_ids=posids,masked_lm_labels=trans_labels) if args.mlm else model(inputs, attention_mask=attention_mask,position_ids=posids,labels=labels)
-                loss2=outputs[0]
-                loss=(loss+loss2)/2
+                trans_labels,changed_flag=translate_label(args.dict,labels,inputs,tokenizer)
+                trans_labels=trans_labels.to(args.device)
+                if changed_flag:
+                    outputs = model(inputs, attention_mask=attention_mask,position_ids=posids,masked_lm_labels=trans_labels) if args.mlm else model(inputs, attention_mask=attention_mask,position_ids=posids,labels=labels)
+                    loss2=outputs[0]
+                    loss=(loss+loss2)/2
 
             if args.n_gpu > 1:
                 loss = loss.mean()  # mean() to average on multi-gpu parallel training
