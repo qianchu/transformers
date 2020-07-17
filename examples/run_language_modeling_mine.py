@@ -326,6 +326,7 @@ def translate_label(trans_dict,labels,inputs,tokenizer):
         input_per_examp=inputs[i]
         new_label=[]
         for l_i,l in enumerate(label):
+            l=int(l)
             if l in trans_dict:
                 l_candidates=trans_dict[l]
                 logger.info('found label {0} with candidates {1}'.format(str(l),str(l_candidates.keys())))
