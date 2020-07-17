@@ -338,7 +338,7 @@ def translate_label(trans_dict,labels,inputs,tokenizer,attention_masks):
                 if l_trans_token:
                     new_label.append(l_trans_token)
                     changed_flag=True
-                    logger.info("replace {0} {1} with {2} {3}".format(str(l),tokenizer.convert_ids_to_token(l),str(l_trans_token),tokenizer.convert_ids_to_token(l_trans_token)))
+                    logger.info("replace {0} {1} with {2} {3}".format(str(l),tokenizer.convert_ids_to_tokens(l),str(l_trans_token),tokenizer.convert_ids_to_tokens(l_trans_token)))
                     continue
             new_label.append(l)
         assert len(new_label)==len(label)
