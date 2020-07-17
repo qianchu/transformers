@@ -38,6 +38,7 @@ from torch.utils.data.distributed import DistributedSampler
 from tqdm import tqdm, trange
 from collections import defaultdict
 from random import shuffle,sample
+from copy import deepcopy
 
 from transformers import (
     MODEL_WITH_LM_HEAD_MAPPING,
@@ -319,14 +320,17 @@ def find_trans(l_i,l,trans_dict,input_per_examp):
 
 
 
-def translate_label(trans_dict,labels,inputs,tokenizer):
+def translate_label(trans_dict,labels,inputs,tokenizer,attention_masks):
     changed_flag=False
     newlabels=[]
     for i,label in enumerate(labels):
+        
         input_per_examp=inputs[i].tolist()
+        attention_mask=attention_masks[i]
+        len_input=int(sum(attention_mask))
         logger.info('input',input_per_examp,'label',label)
         new_label=[]
-        for l_i,l in enumerate(label.tolist()):
+        for l_i,l in enumerate(label.tolist()[:len_input]):
             if l in trans_dict:
                 l_candidates=trans_dict[l]
                 logger.info('found label {0} with candidates {1}'.format(str(l),str(l_candidates.keys())))
@@ -462,7 +466,8 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
             if steps_trained_in_current_epoch > 0:
                 steps_trained_in_current_epoch -= 1
                 continue
-            inputs,attention_mask=batch
+            inputs_orig,attention_mask=batch
+            inputs=deepcopy(inputs_orig)
             inputs, labels = mask_tokens(inputs, tokenizer, args) if args.mlm else (inputs, inputs)
 
             attention_mask=attention_mask.to(args.device)
@@ -478,7 +483,7 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
 
             loss = outputs[0]  # model outputs are always tuple in transformers (see doc)
             if args.dict:
-                trans_labels,changed_flag=translate_label(args.dict,labels,inputs,tokenizer)
+                trans_labels,changed_flag=translate_label(args.dict,labels,inputs_orig,tokenizer,attention_mask)
                 trans_labels=trans_labels.to(args.device)
                 if changed_flag:
                     outputs = model(inputs, attention_mask=attention_mask,position_ids=posids,masked_lm_labels=trans_labels) if args.mlm else model(inputs, attention_mask=attention_mask,position_ids=posids,labels=labels)
