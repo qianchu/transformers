@@ -330,7 +330,8 @@ def translate_label(trans_dict,labels,inputs,tokenizer,attention_masks):
         len_input=int(sum(attention_mask))
         logger.info('input',input_per_examp,'label',label)
         new_label=[]
-        for l_i,l in enumerate(label.tolist()[:len_input]):
+        label=label.tolist()
+        for l_i,l in enumerate(label[:len_input]):
             if l in trans_dict:
                 l_candidates=trans_dict[l]
                 logger.info('found label {0} with candidates {1}'.format(str(l),str(l_candidates.keys())))
@@ -341,6 +342,7 @@ def translate_label(trans_dict,labels,inputs,tokenizer,attention_masks):
                     logger.info("replace {0} {1} with {2} {3}".format(str(l),tokenizer.convert_ids_to_tokens(l),str(l_trans_token),tokenizer.convert_ids_to_tokens(l_trans_token)))
                     continue
             new_label.append(l)
+        new_label+=label[len_input:]
         assert len(new_label)==len(label)
         newlabels.append(new_label)
     assert len(newlabels)==len(labels)
