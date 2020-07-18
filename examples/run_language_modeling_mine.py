@@ -328,18 +328,18 @@ def translate_label(trans_dict,labels,inputs,tokenizer,attention_masks):
         input_per_examp=inputs[i].tolist()
         attention_mask=attention_masks[i]
         len_input=int(sum(attention_mask))
-        logger.info('input',input_per_examp,'label',label)
+        # logger.info('input',input_per_examp,'label',label)
         new_label=[]
         label=label.tolist()
         for l_i,l in enumerate(label[:len_input]):
             if l in trans_dict:
                 l_candidates=trans_dict[l]
-                logger.info('found label {0} with candidates {1}'.format(str(l),str(l_candidates.keys())))
+                logger.debug('found label {0} with candidates {1}'.format(str(l),str(l_candidates.keys())))
                 l_trans_token=find_trans(l_i,l,trans_dict,input_per_examp)
                 if l_trans_token:
                     new_label.append(l_trans_token)
                     changed_flag=True
-                    logger.info("replace {0} {1} with {2} {3}".format(str(l),tokenizer.convert_ids_to_tokens(l),str(l_trans_token),tokenizer.convert_ids_to_tokens(l_trans_token)))
+                    logger.debug("replace {0} {1} with {2} {3}".format(str(l),tokenizer.convert_ids_to_tokens(l),str(l_trans_token),tokenizer.convert_ids_to_tokens(l_trans_token)))
                     continue
             new_label.append(l)
         new_label+=label[len_input:]
