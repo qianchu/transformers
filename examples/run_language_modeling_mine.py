@@ -313,8 +313,8 @@ def find_trans(l_i,l,trans_dict,input_per_examp):
         start=l_i-l_candi_i
         end=l_i+(len(l_candi)-l_candi_i)
         if input_per_examp[start:end]==list(l_candi):
-            l_trans=sample(l_candidates[l_candi],1)[0]
-            l_trans_token=sample(l_trans,1)
+            l_trans=sample(trans_dict[l][l_candi],1)[0]
+            l_trans_token=sample(l_trans,1)[0]
             return l_trans_token
 
 
