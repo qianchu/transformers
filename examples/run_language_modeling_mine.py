@@ -306,7 +306,7 @@ def create_posids(batch):
 
 def find_trans(l_i,l,trans_dict,input_per_examp):
     assert input_per_examp[l_i]==l
-    l_candidates=trans_dict[l]
+    l_candidates=list(trans_dict[l].keys())
     shuffle(l_candidates)
     for l_candi in l_candidates:
         l_candi_i=l_candi.index(l)
