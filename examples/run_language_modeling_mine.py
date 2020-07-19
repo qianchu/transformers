@@ -348,7 +348,7 @@ def translate_label(trans_dict,labels,inputs,tokenizer,attention_masks):
     assert len(newlabels)==len(labels)
     return torch.tensor(newlabels,dtype=labels.dtype),changed_flag
 
-def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedTokenizer) -> Tuple[int, float]:
+def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedTokenizer,trans_dict=None) -> Tuple[int, float]:
     """ Train the model """
     if args.local_rank in [-1, 0]:
         tb_writer = SummaryWriter()
@@ -484,8 +484,8 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
             outputs = model(inputs, attention_mask=attention_mask,position_ids=posids,masked_lm_labels=labels) if args.mlm else model(inputs, attention_mask=attention_mask,position_ids=posids,labels=labels)
 
             loss = outputs[0]  # model outputs are always tuple in transformers (see doc)
-            if args.dict:
-                trans_labels,changed_flag=translate_label(args.dict,labels,inputs_orig,tokenizer,attention_mask)
+            if trans_dict:
+                trans_labels,changed_flag=translate_label(trans_dict,labels,inputs_orig,tokenizer,attention_mask)
                 trans_labels=trans_labels.to(args.device)
                 if changed_flag:
                     outputs = model(inputs, attention_mask=attention_mask,position_ids=posids,masked_lm_labels=trans_labels) if args.mlm else model(inputs, attention_mask=attention_mask,position_ids=posids,labels=labels)
@@ -925,8 +925,9 @@ def main():
 
     logger.info("Training/evaluation parameters %s", args)
 
+    transdict=None
     if args.dict:
-        args.dict=dict_to_id(args.dict,tokenizer)
+        transdict=dict_to_id(args.dict,tokenizer)
     # Training
     if args.do_train:
         if args.local_rank not in [-1, 0]:
@@ -937,7 +938,7 @@ def main():
         if args.local_rank == 0:
             torch.distributed.barrier()
 
-        global_step, tr_loss = train(args, train_dataset, model, tokenizer)
+        global_step, tr_loss = train(args, train_dataset, model, tokenizer,trans_dict)
         logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
 
     # Saving best-practices: if you use save_pretrained for the model and tokenizer, you can reload them using from_pretrained()
