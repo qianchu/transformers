@@ -308,7 +308,7 @@ def tokenid2wordid(input_ids,tokenizer,examples):
 
         w2token_batch.append(w2token)
         input_ids_filtered.append(i)
-    return w2token_batch
+    return w2token_batch,input_ids_filtered
 
 
 
