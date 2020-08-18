@@ -301,6 +301,9 @@ def tokenid2wordid(input_ids,tokenizer,examples):
                 input_start+=1
                 if input_start>=len(input_id):
                     logger.warning ('WARNING: wrong tokenisation {0}'.format(example))
+                    w2token=None
+                break
+            if w2token is None:
                 continue
             input_end=input_start+len(w_ids)
             w2token.append((input_start,input_end))
