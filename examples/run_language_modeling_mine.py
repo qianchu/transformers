@@ -36,6 +36,9 @@ from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import DataLoader, Dataset, RandomSampler, SequentialSampler
 from torch.utils.data.distributed import DistributedSampler
 from tqdm import tqdm, trange
+from collections import defaultdict
+from random import shuffle,sample
+from copy import deepcopy
 
 from transformers import (
     MODEL_WITH_LM_HEAD_MAPPING,
@@ -301,19 +304,51 @@ def create_posids(batch):
 
     return pos_ids
 
-def translate_label(trans_dict,labels):
-    newlabels=[]
-    for label in labels:
-        new_label=[]
-        for l in label:
-            if l in trans_dict:
-               new_label.append(trans_dict[l])
-            else:
-                new_label.append(l)
-            newlabels.append(new_label)
-    return torch.tensor(newlabels,dtype=labels.dtype)
+def find_trans(l_i,l,trans_dict,input_per_examp):
+    assert input_per_examp[l_i]==l
+    l_candidates=list(trans_dict[l].keys())
+    shuffle(l_candidates)
+    for l_candi in l_candidates:
+        l_candi_i=l_candi.index(l)
+        start=l_i-l_candi_i
+        end=l_i+(len(l_candi)-l_candi_i)
+        if input_per_examp[start:end]==list(l_candi):
+            l_trans=sample(trans_dict[l][l_candi],1)[0]
+            l_trans_token=sample(l_trans,1)[0]
+            return l_trans_token
 
-def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedTokenizer) -> Tuple[int, float]:
+
+
+
+def translate_label(trans_dict,labels,inputs,tokenizer,attention_masks):
+    changed_flag=False
+    newlabels=[]
+    for i,label in enumerate(labels):
+        
+        input_per_examp=inputs[i].tolist()
+        attention_mask=attention_masks[i]
+        len_input=int(sum(attention_mask))
+        # logger.info('input',input_per_examp,'label',label)
+        new_label=[]
+        label=label.tolist()
+        for l_i,l in enumerate(label[:len_input]):
+            if l in trans_dict:
+                l_candidates=trans_dict[l]
+                logger.debug('found label {0} with candidates {1}'.format(str(l),str(l_candidates.keys())))
+                l_trans_token=find_trans(l_i,l,trans_dict,input_per_examp)
+                if l_trans_token:
+                    new_label.append(l_trans_token)
+                    changed_flag=True
+                    logger.debug("replace {0} {1} with {2} {3}".format(str(l),tokenizer.convert_ids_to_tokens(l),str(l_trans_token),tokenizer.convert_ids_to_tokens(l_trans_token)))
+                    continue
+            new_label.append(l)
+        new_label+=label[len_input:]
+        assert len(new_label)==len(label)
+        newlabels.append(new_label)
+    assert len(newlabels)==len(labels)
+    return torch.tensor(newlabels,dtype=labels.dtype),changed_flag
+
+def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedTokenizer,trans_dict=None) -> Tuple[int, float]:
     """ Train the model """
     if args.local_rank in [-1, 0]:
         tb_writer = SummaryWriter()
@@ -433,7 +468,8 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
             if steps_trained_in_current_epoch > 0:
                 steps_trained_in_current_epoch -= 1
                 continue
-            inputs,attention_mask=batch
+            inputs_orig,attention_mask=batch
+            inputs=deepcopy(inputs_orig)
             inputs, labels = mask_tokens(inputs, tokenizer, args) if args.mlm else (inputs, inputs)
 
             attention_mask=attention_mask.to(args.device)
@@ -448,8 +484,14 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
             outputs = model(inputs, attention_mask=attention_mask,position_ids=posids,masked_lm_labels=labels) if args.mlm else model(inputs, attention_mask=attention_mask,position_ids=posids,labels=labels)
 
             loss = outputs[0]  # model outputs are always tuple in transformers (see doc)
-            if args.dict:
-                trans_labels=translate_label(args.dict,labels)
+            if trans_dict:
+                trans_labels,changed_flag=translate_label(trans_dict,labels,inputs_orig,tokenizer,attention_mask)
+                trans_labels=trans_labels.to(args.device)
+                if changed_flag:
+                    outputs = model(inputs, attention_mask=attention_mask,position_ids=posids,masked_lm_labels=trans_labels) if args.mlm else model(inputs, attention_mask=attention_mask,position_ids=posids,labels=labels)
+                    loss2=outputs[0]
+                    loss=(loss+loss2)/2
+
             if args.n_gpu > 1:
                 loss = loss.mean()  # mean() to average on multi-gpu parallel training
             if args.gradient_accumulation_steps > 1:
@@ -591,8 +633,31 @@ def evaluate(args, model: PreTrainedModel, tokenizer: PreTrainedTokenizer, prefi
 
     return result
 
+def dict_to_id(dict_f,tokenizer):
+    trans=defaultdict(lambda: defaultdict(list))
+    with open(dict_f,'r',encoding='utf-8') as f:
+        for line in f:
+            w1,w2=line.strip().split()
+            ids1_orig=tokenizer.encode(w1,add_special_tokens=False,add_prefix_space=True)
+            ids2_orig=tokenizer.encode(w2,add_special_tokens=False,add_prefix_space=True)
+            space_i=tokenizer.convert_tokens_to_ids('▁')
+            exclude=list(set(ids1_orig)&set(ids2_orig))+[space_i]
+            ids1=tuple([i for i in ids1_orig if i not in exclude])
+            ids2=tuple([i for i in ids2_orig if i not in exclude])
+            if len(ids1)>0 and len(ids2)>0:
+                # logger.info("ids1 {0} ids2 {1}".format(ids1,ids2))
+                # if len(ids1)==1==len(ids2):
+                for id in ids1:
+                    trans[id][ids1].append(ids2)
+                for id in ids2:
+                    trans[id][ids2].append(ids1)
+
+
+    return trans
+                
 
 def main():
+   
     parser = argparse.ArgumentParser()
 
     # Required parameters
@@ -739,9 +804,10 @@ def main():
     parser.add_argument("--local_rank", type=int, default=-1, help="For distributed training: local_rank")
     parser.add_argument("--server_ip", type=str, default="", help="For distant debugging.")
     parser.add_argument("--server_port", type=str, default="", help="For distant debugging.")
-    parser.add_argument('--dict',type=str,help='dictionary file location')
+    parser.add_argument("--dict",type=str,help='dictionary file location')
     args = parser.parse_args()
 
+   
     if args.model_type in ["bert", "roberta", "distilbert", "camembert"] and not args.mlm:
         raise ValueError(
             "BERT and RoBERTa-like models do not have LM heads but masked LM heads. They must be run using the --mlm "
@@ -859,6 +925,9 @@ def main():
 
     logger.info("Training/evaluation parameters %s", args)
 
+    transdict=None
+    if args.dict:
+        transdict=dict_to_id(args.dict,tokenizer)
     # Training
     if args.do_train:
         if args.local_rank not in [-1, 0]:
@@ -869,7 +938,7 @@ def main():
         if args.local_rank == 0:
             torch.distributed.barrier()
 
-        global_step, tr_loss = train(args, train_dataset, model, tokenizer)
+        global_step, tr_loss = train(args, train_dataset, model, tokenizer,transdict)
         logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
 
     # Saving best-practices: if you use save_pretrained for the model and tokenizer, you can reload them using from_pretrained()
