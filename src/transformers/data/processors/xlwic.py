@@ -36,7 +36,7 @@ class XlwicProcessor(DataProcessor):
     def get_train_examples(self, data_dir):
         """See base class."""
         lg = self.language if self.train_language is None else self.train_language
-        lines = self._read_tsv(os.path.join(data_dir, "xlwic/{}/train.{}.tsv".format(lg)))
+        lines = self._read_tsv(os.path.join(data_dir, "/{}/train.tsv".format(lg)))
         examples = []
         for (i, line) in enumerate(lines):
             if i == 0:
@@ -52,7 +52,7 @@ class XlwicProcessor(DataProcessor):
     def get_test_examples(self, data_dir,testset='test'):
         """See base class."""
         lg = self.language
-        lines = self._read_tsv(os.path.join(data_dir, "xlwic/{0}/{1}.{0}.tsv".format(lg,testset)))
+        lines = self._read_tsv(os.path.join(data_dir, "{0}/{1}.tsv".format(lg,testset)))
         examples = []
         for (i, line) in enumerate(lines):
             if i == 0:
