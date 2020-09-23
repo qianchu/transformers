@@ -347,8 +347,11 @@ def examples2embeds(examples,tokenizer,model,device,writer,args):
                 if sent in writer:
                     print ('already exist',sent.encode('utf-8'))
                 else:
-                    writer.create_dataset(sent, payload.shape, dtype='float32', compression="gzip", compression_opts=9,
-                                      data=payload)
+                    if len(sent.split('\t'))==len(payload):
+                        writer.create_dataset(sent, payload.shape, dtype='float32', compression="gzip", compression_opts=9,
+                                        data=payload)
+                    else:
+                        print ('WARNING. Wrong tokenisation')
             except OSError as e:
                 print(e, sent)
 
