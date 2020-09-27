@@ -236,6 +236,54 @@ class MnliProcessor(DataProcessor):
         return examples
 
 
+class XlwicProcessor(DataProcessor):
+    """Processor for the XNLI dataset.
+    Adapted from https://github.com/google-research/bert/blob/f39e881b169b9d53bea03d2d341b31707a6c052b/run_classifier.py#L207"""
+
+    def __init__(self, language='en', train_language=None):
+        self.language = language
+        self.train_language = train_language
+
+    def get_train_examples(self, data_dir):
+        """See base class."""
+        lg = self.language if self.train_language is None else self.train_language
+        fname=os.path.join(data_dir, "{}/train.tsv".format(lg))
+        logger.info("train file: "+fname)
+        lines = self._read_tsv(fname)
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "%s-%s" % ("train", i)
+            text_a = line[0]
+            text_b = line[1]
+            label = "T" if line[2] == "T" else line[2]
+            assert isinstance(text_a, str) and isinstance(text_b, str) and isinstance(label, str)
+            examples.append(InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
+
+    def get_dev_examples(self, data_dir,testset='test'):
+        """See base class."""
+        lg = self.language
+        lines = self._read_tsv(os.path.join(data_dir, "{0}/{1}.tsv".format(lg,testset)))
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "%s-%s" % (testset, i)
+            text_a = line[0]
+            text_b = line[1]
+            label = "T" if line[2] == "T" else line[2]
+            assert isinstance(text_a, str) and isinstance(text_b, str) and isinstance(label, str)
+            examples.append(InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
+
+   
+
+    def get_labels(self):
+        """See base class."""
+        return ["T","F"]
+
 class MnliMismatchedProcessor(MnliProcessor):
     """Processor for the MultiNLI Mismatched data set (GLUE version)."""
 
@@ -519,6 +567,7 @@ glue_tasks_num_labels = {
     "qnli": 2,
     "rte": 2,
     "wnli": 2,
+    "xlwic":2
 }
 
 glue_processors = {
@@ -532,6 +581,7 @@ glue_processors = {
     "qnli": QnliProcessor,
     "rte": RteProcessor,
     "wnli": WnliProcessor,
+    "xlwic": XlwicProcessor
 }
 
 glue_output_modes = {
@@ -545,4 +595,5 @@ glue_output_modes = {
     "qnli": "classification",
     "rte": "classification",
     "wnli": "classification",
+    "xlwic":"classification"
 }
