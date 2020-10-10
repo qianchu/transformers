@@ -81,12 +81,10 @@ def set_seed(args):
 
 def find_token_id(input_id,tokenizer):
     token_pos_start_id=tokenizer.encode('[',add_special_tokens=False)[0]
-    logger.info('[ token id',token_pos_start_id)
     # token_pos_end_id=tokenizer.encode(']')
     
     token_ids=[]
     token_ids_alter=[]
-    print (input_id)
     for i,input_i in enumerate(input_id):
         # if i==len(input_id)-1: # the last token
         #     continue
@@ -102,16 +100,20 @@ def find_token_id(input_id,tokenizer):
             if input_id[i+1]!=tokenizer.sep_token_id and input_id[i+1]!=tokenizer.mask_token_id:
                 token_ids_alter.append(i+1)
 
-    logger.infor('token id alter',token_ids_alter)
-    logger.infor('token ids',token_ids)
+    print('token id alter',token_ids_alter)
+    print('token ids',token_ids)
     assert len(token_ids_alter)==2
     if len(token_ids)<2:
-        logger.info("Warning: [ out of sentence",input_id,token_ids)
+        print (input_id)
+        print('[ token id ',token_pos_start_id)
+        logger.warn("Warning: [ out of sentence {0} {1}".format(input_id,token_ids))
         return token_ids_alter
     if len(token_ids)==2:
         return token_ids
     if len(token_ids)>2:
-        logger.info('Warning: more than two [',input_id,token_ids)
+        print (input_id)
+        print('[ token id ',token_pos_start_id)
+        logger.warn('Warning: more than two ['.format(input_id,token_ids))
         return token_ids[:2]
 
 def train(args, train_dataset, model, tokenizer):
