@@ -80,19 +80,19 @@ def set_seed(args):
         torch.cuda.manual_seed_all(args.seed)
 
 def find_token_id(input_id,tokenizer):
-    token_pos_start_id=tokenizer.encode('[')
+    token_pos_start_id=tokenizer.encode('[',add_special_tokens=False)[0]
     # token_pos_end_id=tokenizer.encode(']')
     
     token_ids=[]
-    token_ids_alter=input_id[1]
+    token_ids_alter=[1]
     for i,input_i in enumerate(input_id):
-        if i==len(input_i)-1:
+        if i==len(input_id)-1: # the last token
             continue
         if input_i ==token_pos_start_id:
-            token_ids.append(input_i+1)
+            token_ids.append(i+1)
         if input_i==tokenizer.sep_token_id:
-            if input_id[input_i+1]!=tokenizer.sep_token_id:
-                token_ids_alter.append(input_i+1)
+            if input_id[i+1]!=tokenizer.sep_token_id:
+                token_ids_alter.append(i+1)
     assert len(token_ids_alter)==2
     if len(token_ids)<2:
         logger.info("Warning: [ out of sentence",input_id,token_ids)
