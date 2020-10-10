@@ -81,26 +81,29 @@ def set_seed(args):
 
 def find_token_id(input_id,tokenizer):
     token_pos_start_id=tokenizer.encode('[',add_special_tokens=False)[0]
+    logger.info('[ token id',token_pos_start_id)
     # token_pos_end_id=tokenizer.encode(']')
     
     token_ids=[]
     token_ids_alter=[]
     print (input_id)
     for i,input_i in enumerate(input_id):
-        if i==len(input_id)-1: # the last token
-            continue
-        if input_i in [tokenizer.mask_token_id,tokenizer.bos_token_id]:
+        # if i==len(input_id)-1: # the last token
+        #     continue
+        if input_i in [tokenizer.mask_token_id,tokenizer.cls_token_id]:
             continue
         if token_ids_alter==[]:
             token_ids_alter.append(i)
+            logger.info('first word alter',token_ids_alter)
         if input_i ==token_pos_start_id:
             token_ids.append(i+1)
             logger.info("first word",token_ids)
         if input_i==tokenizer.sep_token_id:
-            if input_id[i+1]!=tokenizer.sep_token_id:
+            if input_id[i+1]!=tokenizer.sep_token_id and input_id[i+1]!=tokenizer.mask_token_id:
                 token_ids_alter.append(i+1)
 
-    print ('token id alter',token_ids_alter)
+    logger.infor('token id alter',token_ids_alter)
+    logger.infor('token ids',token_ids)
     assert len(token_ids_alter)==2
     if len(token_ids)<2:
         logger.info("Warning: [ out of sentence",input_id,token_ids)
