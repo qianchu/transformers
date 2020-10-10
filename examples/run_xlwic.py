@@ -21,6 +21,7 @@ import argparse
 import glob
 import logging
 import os
+import sys
 import random
 
 import numpy as np
@@ -118,9 +119,13 @@ def find_token_id(input_id,tokenizer):
         print('Warning: more than two [',token_ids)
         token_ids=token_ids[:2]
     try:
+        assert token_ids
         assert len(token_ids)==2
     except AssertionError as e:
         print ('Warning: token_ids not length 2',token_ids)
+        print (input_id)
+        sys.exit(1)
+    assert len(token_ids)==2
     return token_ids
 def train(args, train_dataset, model, tokenizer):
     """ Train the model """
