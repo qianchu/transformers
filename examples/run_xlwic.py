@@ -103,8 +103,9 @@ def find_token_id(input_id,tokenizer):
     print('token id alter',token_ids_alter)
     print('token ids',token_ids)
     try:
-        assert len(token_ids_alter)==2
+        assert len(token_qids_alter)==2
     except AssertionError as e:
+        print ('token id alter is not length 2')
         print (input_id)
         print (token_ids_alter)
     if len(token_ids)<2:
