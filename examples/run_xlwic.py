@@ -103,7 +103,7 @@ def find_token_id(input_id,tokenizer):
     print('token id alter',token_ids_alter)
     print('token ids',token_ids)
     try:
-        assert len(token_qids_alter)==2
+        assert len(token_ids_alter)==2
     except AssertionError as e:
         print ('token id alter is not length 2')
         print (input_id)
@@ -111,14 +111,14 @@ def find_token_id(input_id,tokenizer):
     if len(token_ids)<2:
         print (input_id)
         print('[ token id ',token_pos_start_id)
-        logger.warn("Warning: [ out of sentence {0} {1}".format(input_id,token_ids))
+        print("Warning: [ out of sentence {0} {1}".format(input_id,token_ids))
         return token_ids_alter
     if len(token_ids)==2:
         return token_ids
     if len(token_ids)>2:
         print (input_id)
         print('[ token id ',token_pos_start_id)
-        logger.warn('Warning: more than two ['.format(input_id,token_ids))
+        print('Warning: more than two [',token_ids)
         return token_ids[:2]
 
 def train(args, train_dataset, model, tokenizer):
