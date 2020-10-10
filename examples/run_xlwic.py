@@ -35,6 +35,7 @@ from transformers import (
     BertConfig,
     BertForSequenceClassification,
     BertTokenizer,
+    BertForSequenceTokenClassification,
     DistilBertConfig,
     DistilBertForSequenceClassification,
     DistilBertTokenizer,
@@ -64,7 +65,7 @@ ALL_MODELS = sum(
 )
 
 MODEL_CLASSES = {
-    "bert": (BertConfig, BertForSequenceClassification, BertTokenizer),
+    "bert": (BertConfig, BertForSequenceTokenClassification, BertTokenizer),
     "xlm": (XLMConfig, XLMForSequenceClassification, XLMTokenizer),
     "distilbert": (DistilBertConfig, DistilBertForSequenceClassification, DistilBertTokenizer),
     'xlm-r':(XLMRobertaConfig, XLMRobertaForSequenceClassification,XLMRobertaTokenizer),
@@ -78,6 +79,29 @@ def set_seed(args):
     if args.n_gpu > 0:
         torch.cuda.manual_seed_all(args.seed)
 
+def find_token_id(input_id,tokenizer):
+    token_pos_start_id=tokenizer.encode('[')
+    # token_pos_end_id=tokenizer.encode(']')
+    
+    token_ids=[]
+    token_ids_alter=input_id[1]
+    for i,input_i in enumerate(input_id):
+        if i==len(input_i)-1:
+            continue
+        if input_i ==token_pos_start_id:
+            token_ids.append(input_i+1)
+        if input_i==tokenizer.sep_token_id:
+            if input_id[input_i+1]!=tokenizer.sep_token_id:
+                token_ids_alter.append(input_i+1)
+    assert len(token_ids_alter)==2
+    if len(token_ids)<2:
+        logger.info("Warning: [ out of sentence",input_id,token_ids)
+        return token_ids_alter
+    if len(token_ids)==2:
+        return token_ids
+    if len(token_ids)>2:
+        logger.info('Warning: more than two ['],input_id,token_ids)
+        return token_ids[:2]
 
 def train(args, train_dataset, model, tokenizer):
     """ Train the model """
@@ -178,7 +202,7 @@ def train(args, train_dataset, model, tokenizer):
 
             model.train()
             batch = tuple(t.to(args.device) for t in batch)
-            inputs = {"input_ids": batch[0], "attention_mask": batch[1], "labels": batch[3]}
+            inputs = {"input_ids": batch[0], "attention_mask": batch[1], "labels": batch[3],'token_ids':batch[4]}
             if args.model_type != "distilbert":
                 inputs["token_type_ids"] = (
                     batch[2] if args.model_type in ["bert"] else None
@@ -361,6 +385,7 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False,testset='test'
 
     # Convert to Tensors and build dataset
     all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
+    all_token_ids=torch.tensor([find_token_id(f.input_ids) for f in features], dtype=torch.long)
     all_attention_mask = torch.tensor([f.attention_mask for f in features], dtype=torch.long)
     all_token_type_ids = torch.tensor([f.token_type_ids if type(f.token_type_ids)!=type(None) else [0]*len(f.attention_mask) for f in features], dtype=torch.long)
     if output_mode == "classification":
@@ -368,7 +393,7 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False,testset='test'
     else:
         raise ValueError("No other `output_mode` for XLWIC.")
 
-    dataset = TensorDataset(all_input_ids, all_attention_mask, all_token_type_ids, all_labels)
+    dataset = TensorDataset(all_input_ids, all_attention_mask, all_token_type_ids, all_labels,all_token_ids)
     return dataset
 
 
