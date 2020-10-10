@@ -86,8 +86,8 @@ def find_token_id(input_id,tokenizer):
     token_ids=[]
     token_ids_alter=[]
     for i,input_i in enumerate(input_id):
-        # if i==len(input_id)-1: # the last token
-        #     continue
+        if i==len(input_id)-1: # the last token
+            continue
         if input_i in [tokenizer.mask_token_id,tokenizer.cls_token_id,tokenizer.pad_token_id]:
             continue
         if token_ids_alter==[]:
