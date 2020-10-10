@@ -88,16 +88,16 @@ def find_token_id(input_id,tokenizer):
     for i,input_i in enumerate(input_id):
         # if i==len(input_id)-1: # the last token
         #     continue
-        if input_i in [tokenizer.mask_token_id,tokenizer.cls_token_id]:
+        if input_i in [tokenizer.mask_token_id,tokenizer.cls_token_id,tokenizer.pad_token_id]:
             continue
         if token_ids_alter==[]:
             token_ids_alter.append(i)
-            logger.info('first word alter',token_ids_alter)
+            # logger.info('first word alter',token_ids_alter)
         if input_i ==token_pos_start_id:
             token_ids.append(i+1)
-            logger.info("first word",token_ids)
+            # logger.info("first word",token_ids)
         if input_i==tokenizer.sep_token_id:
-            if input_id[i+1]!=tokenizer.sep_token_id and input_id[i+1]!=tokenizer.mask_token_id:
+            if input_id[i+1]!=tokenizer.sep_token_id and input_id[i+1]!=tokenizer.pad_token_id:
                 token_ids_alter.append(i+1)
 
     print('token id alter',token_ids_alter)
