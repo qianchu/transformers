@@ -1145,8 +1145,12 @@ class BertForSequenceTokenClassification(BertPreTrainedModel):
             head_mask=head_mask,
             inputs_embeds=inputs_embeds,
         )
-
-        pooled_output_w1 = outputs[0][range(outputs[0].size()[0]),token_ids[:,0],:]
+        try:
+            pooled_output_w1 = outputs[0][range(outputs[0].size()[0]),token_ids[:,0],:]
+        except TypeError as e:
+            print ('Warning: Nonetype token ids',e)
+            print (outputs[0].size())
+            print (token_ids)
         pooled_output_w2 = outputs[0][range(outputs[0].size()[0]),token_ids[:,1],:]
         pooled_output=torch.cat((pooled_output_w1,pooled_output_w2),1)
         pooled_output = self.dropout(pooled_output)

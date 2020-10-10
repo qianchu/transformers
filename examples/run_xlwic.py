@@ -341,7 +341,7 @@ def evaluate(args, model, tokenizer, testset='test',prefix=""):
                     inputs["token_type_ids"] = (
                         batch[2] if args.model_type in ["bert"] else None
                     )  # XLM and DistilBERT don't use segment_ids
-                outputs = model(**inputs)
+                outputs = model(**inputs,token_ids=batch[4])
                 tmp_eval_loss, logits = outputs[:2]
 
                 eval_loss += tmp_eval_loss.mean().item()
