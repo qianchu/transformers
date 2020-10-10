@@ -100,7 +100,7 @@ def find_token_id(input_id,tokenizer):
     if len(token_ids)==2:
         return token_ids
     if len(token_ids)>2:
-        logger.info('Warning: more than two ['],input_id,token_ids)
+        logger.info('Warning: more than two [',input_id,token_ids)
         return token_ids[:2]
 
 def train(args, train_dataset, model, tokenizer):
