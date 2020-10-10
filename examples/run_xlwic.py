@@ -385,7 +385,7 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False,testset='test'
 
     # Convert to Tensors and build dataset
     all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
-    all_token_ids=torch.tensor([find_token_id(f.input_ids) for f in features], dtype=torch.long)
+    all_token_ids=torch.tensor([find_token_id(f.input_ids,tokenizer) for f in features], dtype=torch.long)
     all_attention_mask = torch.tensor([f.attention_mask for f in features], dtype=torch.long)
     all_token_type_ids = torch.tensor([f.token_type_ids if type(f.token_type_ids)!=type(None) else [0]*len(f.attention_mask) for f in features], dtype=torch.long)
     if output_mode == "classification":
