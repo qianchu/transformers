@@ -252,6 +252,7 @@ if is_torch_available():
         RobertaForMaskedLM,
         RobertaModel,
         RobertaForSequenceClassification,
+        RobertaForSequenceTokenClassification,
         RobertaForMultipleChoice,
         RobertaForTokenClassification,
         RobertaForQuestionAnswering,
@@ -298,6 +299,7 @@ if is_torch_available():
         XLMRobertaModel,
         XLMRobertaForMultipleChoice,
         XLMRobertaForSequenceClassification,
+        XLMRobertaForSequenceTokenClassification,
         XLMRobertaForTokenClassification,
         XLM_ROBERTA_PRETRAINED_MODEL_ARCHIVE_MAP,
     )
