@@ -263,8 +263,8 @@ def train(args, train_dataset, model, tokenizer):
                         args.local_rank == -1 and args.evaluate_during_training
                     ):  # Only evaluate when single GPU otherwise metrics may not average well
                         results = evaluate(args, model, tokenizer,testset='dev')
-                        results = evaluate(args, model, tokenizer,testset='test_hard')
-                        results = evaluate(args, model, tokenizer,testset='test_easy')
+                        # results = evaluate(args, model, tokenizer,testset='test_hard')
+                        # results = evaluate(args, model, tokenizer,testset='test_easy')
                         results = evaluate(args, model, tokenizer)
                         for key, value in results.items():
                             tb_writer.add_scalar("eval_{}".format(key), value, global_step)
