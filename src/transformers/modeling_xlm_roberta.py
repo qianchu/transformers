@@ -95,6 +95,20 @@ class XLMRobertaForSequenceClassification(RobertaForSequenceClassification):
     config_class = XLMRobertaConfig
     pretrained_model_archive_map = XLM_ROBERTA_PRETRAINED_MODEL_ARCHIVE_MAP
 
+@add_start_docstrings(
+    """XLM-RoBERTa Model transformer with a sequence classification/regression head on top (a linear layer
+    on top of the pooled output) e.g. for GLUE tasks. """,
+    XLM_ROBERTA_START_DOCSTRING,
+)
+class XLMRobertaForSequenceTokenClassification(RobertaForSequenceTokenClassification):
+    """
+    This class overrides :class:`~transformers.RobertaForSequenceTokenClassification`. Please check the
+    superclass for the appropriate documentation alongside usage examples.
+    """
+
+    config_class = XLMRobertaConfig
+    pretrained_model_archive_map = XLM_ROBERTA_PRETRAINED_MODEL_ARCHIVE_MAP
+
 
 @add_start_docstrings(
     """XLM-RoBERTa Model with a multiple choice classification head on top (a linear layer on top of
