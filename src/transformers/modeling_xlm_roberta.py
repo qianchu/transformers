@@ -24,6 +24,7 @@ from .modeling_roberta import (
     RobertaForMaskedLM,
     RobertaForMultipleChoice,
     RobertaForSequenceClassification,
+    RobertaForSequenceTokenClassification
     RobertaForTokenClassification,
     RobertaModel,
 )
