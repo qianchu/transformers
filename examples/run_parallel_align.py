@@ -126,7 +126,7 @@ class LineByLineTextDataset(Dataset):
             assert os.path.isfile(file_src_para_path)
             assert os.path.isfile(file_tgt_para_path)
             ids_src,ids_tgt,attention_mask_src,attention_mask_tgt=self.produce_tokens_para(tokenizer, args, file_src_para_path,file_tgt_para_path, int(block_size/2))
-            assert len(ids_sr)==len(ids_tgt)==len(attention_mask_src)==len(attention_mask_tgt)
+            assert len(ids_src)==len(ids_tgt)==len(attention_mask_src)==len(attention_mask_tgt)
             examples_para=self.concatenat_parallel(ids_src,ids_tgt,attention_mask_src,attention_mask_tgt)
             logger.info('example para sample {0}'.format(examples_para[0].__repr__()))
 
@@ -141,7 +141,7 @@ class LineByLineTextDataset(Dataset):
         self.examples=examples
 
     def concatenat_parallel(self,examples_src,examples_tgt,src_attention_mask,tgt_attention_mask):
-        examples_para=list(zip(examples_src,examples_tgt))
+        examples_para=list(zip(examples_src,examples_tgt,src_attention_mask,tgt_attention_mask))
         # examples_para=[]
         # # positions_para=[]
         # for i,data_src in enumerate(examples_src):
