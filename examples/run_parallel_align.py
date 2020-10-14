@@ -45,7 +45,7 @@ from transformers import (
     WEIGHTS_NAME,
     AdamW,
     AutoConfig,
-    AutoModelWithLMHead,
+    AutoModelForParaAlign,
     AutoModel,
     AutoTokenizer,
     PreTrainedModel,
@@ -504,17 +504,16 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
             #     posids=None
             model.train()
             # logger.info('sample posids {0}',posids[0].__repr__())
-            outputs_src = model(inputs_src, attention_mask=attention_mask_src) 
-            outputs_tgt = model(inputs_tgt, attention_mask=attention_mask_tgt) 
+            loss = model(input_ids_src=inputs_src, input_ids_tgt=inputs_tgt,attention_mask_src=attention_mask_src,attention_mask_tgt=attention_mask_tgt) 
 
             # loss = outputs[0]  # model outputs are always tuple in transformers (see doc)
-            if trans_dict:
-                trans_labels,changed_flag=translate_label(trans_dict,labels,inputs_orig,tokenizer,attention_mask)
-                trans_labels=trans_labels.to(args.device)
-                if changed_flag:
-                    outputs = model(inputs, attention_mask=attention_mask,position_ids=posids,masked_lm_labels=trans_labels) if args.mlm else model(inputs, attention_mask=attention_mask,position_ids=posids,labels=labels)
-                    loss2=outputs[0]
-                    loss=(loss+loss2)/2
+            # if trans_dict:
+            #     trans_labels,changed_flag=translate_label(trans_dict,labels,inputs_orig,tokenizer,attention_mask)
+            #     trans_labels=trans_labels.to(args.device)
+            #     if changed_flag:
+            #         outputs = model(inputs, attention_mask=attention_mask,position_ids=posids,masked_lm_labels=trans_labels) if args.mlm else model(inputs, attention_mask=attention_mask,position_ids=posids,labels=labels)
+            #         loss2=outputs[0]
+            #         loss=(loss+loss2)/2
 
             if args.n_gpu > 1:
                 loss = loss.mean()  # mean() to average on multi-gpu parallel training
@@ -932,7 +931,7 @@ def main():
         args.block_size = min(args.block_size, tokenizer.max_len)
 
     if args.model_name_or_path:
-        model = AutoModel.from_pretrained(
+        model = AutoModelForParaAlign.from_pretrained(
             args.model_name_or_path,
             from_tf=bool(".ckpt" in args.model_name_or_path),
             config=config,
@@ -940,7 +939,7 @@ def main():
         )
     else:
         logger.info("Training new model from scratch")
-        model = AutoModel.from_config(config)
+        model = AutoModelForParaAlign.from_config(config)
 
     model.to(args.device)
 
@@ -984,7 +983,7 @@ def main():
         torch.save(args, os.path.join(args.output_dir, "training_args.bin"))
 
         # Load a trained model and vocabulary that you have fine-tuned
-        model = AutoModel.from_pretrained(args.output_dir)
+        model = AutoModelForParaAlign.from_pretrained(args.output_dir)
         tokenizer = AutoTokenizer.from_pretrained(args.output_dir)
         model.to(args.device)
 
@@ -1002,7 +1001,7 @@ def main():
             global_step = checkpoint.split("-")[-1] if len(checkpoints) > 1 else ""
             prefix = checkpoint.split("/")[-1] if checkpoint.find("checkpoint") != -1 else ""
 
-            model = AutoModel.from_pretrained(checkpoint)
+            model = AutoModelForParaAlign.from_pretrained(checkpoint)
             model.to(args.device)
             result = evaluate(args, model, tokenizer, prefix=prefix)
             result = dict((k + "_{}".format(global_step), v) for k, v in result.items())

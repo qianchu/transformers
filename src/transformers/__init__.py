@@ -169,6 +169,7 @@ if is_torch_available():
         AutoModelWithLMHead,
         AutoModelForTokenClassification,
         AutoModelForMultipleChoice,
+        AutoModelForParaAlign,
         ALL_PRETRAINED_MODEL_ARCHIVE_MAP,
         MODEL_MAPPING,
         MODEL_FOR_PRETRAINING_MAPPING,
@@ -256,6 +257,7 @@ if is_torch_available():
         RobertaForMultipleChoice,
         RobertaForTokenClassification,
         RobertaForQuestionAnswering,
+        RobertaForParaAlign,
         ROBERTA_PRETRAINED_MODEL_ARCHIVE_MAP,
     )
     from .modeling_distilbert import (
@@ -301,6 +303,7 @@ if is_torch_available():
         XLMRobertaForSequenceClassification,
         XLMRobertaForSequenceTokenClassification,
         XLMRobertaForTokenClassification,
+        XLMRobertaForParaAlign,
         XLM_ROBERTA_PRETRAINED_MODEL_ARCHIVE_MAP,
     )
     from .modeling_mmbt import ModalEmbeddings, MMBTModel, MMBTForClassification

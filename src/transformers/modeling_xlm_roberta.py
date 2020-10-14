@@ -26,6 +26,7 @@ from .modeling_roberta import (
     RobertaForSequenceClassification,
     RobertaForSequenceTokenClassification,
     RobertaForTokenClassification,
+    RobertaForParaAlign,
     RobertaModel,
 )
 
@@ -90,6 +91,21 @@ class XLMRobertaForMaskedLM(RobertaForMaskedLM):
 class XLMRobertaForSequenceClassification(RobertaForSequenceClassification):
     """
     This class overrides :class:`~transformers.RobertaForSequenceClassification`. Please check the
+    superclass for the appropriate documentation alongside usage examples.
+    """
+
+    config_class = XLMRobertaConfig
+    pretrained_model_archive_map = XLM_ROBERTA_PRETRAINED_MODEL_ARCHIVE_MAP
+
+
+@add_start_docstrings(
+    """XLM-RoBERTa Model transformer with a parallel sentence alignment head on top (a linear layer
+    on top of the pooled output) e.g. for GLUE tasks. """,
+    XLM_ROBERTA_START_DOCSTRING,
+)
+class XLMRobertaForParaAlign(RobertaForParaAlign):
+    """
+    This class overrides :class:`~transformers.RobertaForSequenceTokenClassification`. Please check the
     superclass for the appropriate documentation alongside usage examples.
     """
 
