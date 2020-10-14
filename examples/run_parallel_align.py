@@ -826,11 +826,11 @@ def main():
     args = parser.parse_args()
 
    
-    if args.model_type in ["bert", "roberta", "distilbert", "camembert"] and not args.mlm:
-        raise ValueError(
-            "BERT and RoBERTa-like models do not have LM heads but masked LM heads. They must be run using the --mlm "
-            "flag (masked language modeling)."
-        )
+    # if args.model_type in ["bert", "roberta", "distilbert", "camembert"] and not args.mlm:
+    #     raise ValueError(
+    #         "BERT and RoBERTa-like models do not have LM heads but masked LM heads. They must be run using the --mlm "
+    #         "flag (masked language modeling)."
+    #     )
     if args.eval_data_file is None and args.do_eval:
         raise ValueError(
             "Cannot do evaluation without an evaluation data file. Either supply a file to --eval_data_file "
