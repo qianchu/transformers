@@ -188,8 +188,8 @@ class LineByLineTextDataset(Dataset):
             tgtlines=f_tgt.read().splitlines()
             lines = [(srcline,tgtlines[i]) for i,srcline in enumerate(srclines) if (len(srcline) > 0 and not srcline.isspace() and len(tgtlines[i])>0 and not tgtlines[i].isspace() )]
             srclines,tgtlines=list(zip(*lines))
-        src_examples = tokenizer.batch_encode_plus(srclines, add_special_tokens=True, max_length=block_size,pad_to_max_length=True)["input_ids"]
-        tgt_examples = tokenizer.batch_encode_plus(tgtlines, add_special_tokens=True, max_length=block_size,pad_to_max_length=True)["input_ids"]
+        src_examples = tokenizer.batch_encode_plus(srclines, add_special_tokens=True, max_length=block_size,pad_to_max_length=True)
+        tgt_examples = tokenizer.batch_encode_plus(tgtlines, add_special_tokens=True, max_length=block_size,pad_to_max_length=True)
         src_examples_ids=src_examples['input_ids']
         tgt_examples_ids=tgt_examples['input_ids']
         src_examples_attention_mask=src_examples['attention_mask']
@@ -376,7 +376,7 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
         #      in tgt_examples])
 
         return src_id,tgt_id,src_am,tgt_am
-
+    print ('train dataset', train_dataset)
     train_sampler = RandomSampler(train_dataset) if args.local_rank == -1 else DistributedSampler(train_dataset)
     train_dataloader = DataLoader(
         train_dataset, sampler=train_sampler, batch_size=args.train_batch_size, collate_fn=collate
