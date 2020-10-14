@@ -121,12 +121,17 @@ class LineByLineTextDataset(Dataset):
         # positions_ids=self.produce_position_ids(examples)
 
         if file_para_path:
-
+            examples=[]
             file_src_para_path,file_tgt_para_path=file_para_path
             assert os.path.isfile(file_src_para_path)
             assert os.path.isfile(file_tgt_para_path)
             ids_src,ids_tgt,attention_mask_src,attention_mask_tgt=self.produce_tokens_para(tokenizer, args, file_src_para_path,file_tgt_para_path, int(block_size/2))
             assert len(ids_src)==len(ids_tgt)==len(attention_mask_src)==len(attention_mask_tgt)
+            logger.info('example ids src {0}'.format(ids_src.__repr__()))
+            logger.info('example ids tgt {0}'.format(ids_tgt.__repr__()))
+            logger.info('example am src {0}'.format(attention_mask_src.__repr__()))
+            logger.info('example am tgt {0}'.format(attention_mask_tgt.__repr__()))
+
             examples_para=self.concatenat_parallel(ids_src,ids_tgt,attention_mask_src,attention_mask_tgt)
             logger.info('example para sample {0}'.format(examples_para[0].__repr__()))
 
