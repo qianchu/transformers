@@ -211,7 +211,7 @@ class LineByLineTextDataset(Dataset):
 
 def load_and_cache_examples(args, tokenizer, evaluate=False):
     file_path = args.eval_data_file if evaluate else args.train_data_file
-    para_data_file = None if evaluate else args.para_data_file
+    para_data_file = args.para_data_file_eval if evaluate else args.para_data_file
 
     if args.line_by_line:
         return LineByLineTextDataset(tokenizer, args, file_path=file_path, file_para_path=para_data_file,block_size=args.block_size)
@@ -700,6 +700,14 @@ def main():
     # Other parameters
     parser.add_argument(
         "--para_data_file",
+        default=None,
+        type=str,
+        nargs='+',
+        help="[para src file, para tgt file]",
+    )
+
+    parser.add_argument(
+        "--para_data_file_eval",
         default=None,
         type=str,
         nargs='+',
