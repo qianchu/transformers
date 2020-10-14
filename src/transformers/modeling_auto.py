@@ -232,8 +232,9 @@ MODEL_FOR_PARA_ALIGN_MAPPING = OrderedDict(
         (RobertaConfig, RobertaForParaAlign),
       
     ]
+)
 
-)MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING = OrderedDict(
+MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING = OrderedDict(
     [
         (DistilBertConfig, DistilBertForSequenceClassification),
         (AlbertConfig, AlbertForSequenceClassification),
