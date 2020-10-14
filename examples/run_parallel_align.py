@@ -368,7 +368,7 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
 
     def collate(examples):
         src_id,tgt_id,src_am,tgt_am=list(zip(*examples))
-        print (src_id)
+        # print (src_id)
         src_id,tgt_id,src_am,tgt_am=torch.stack(src_id),torch.stack(tgt_id),torch.stack(src_am),torch.stack(tgt_am)
         # padding_value = 0 if tokenizer._pad_token is None else tokenizer.pad_token_id
         # input_ids_src = pad_sequence(src_examples, batch_first=True, padding_value=padding_value)
@@ -487,10 +487,10 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
                 steps_trained_in_current_epoch -= 1
                 continue
             inputs_src,inputs_tgt,attention_mask_src,attention_mask_tgt=batch
-            print ('inputs src',inputs_src)
-            print ('inputs_tgt',inputs_tgt)
-            print ('attention_mask_src',attention_mask_src)
-            print ('attention_mask_tgt',attention_mask_tgt)
+            # print ('inputs src',inputs_src)
+            # print ('inputs_tgt',inputs_tgt)
+            # print ('attention_mask_src',attention_mask_src)
+            # print ('attention_mask_tgt',attention_mask_tgt)
             # inputs=deepcopy(inputs_orig)
             # inputs, labels = mask_tokens(inputs, tokenizer, args) if args.mlm else (inputs, inputs)
 
