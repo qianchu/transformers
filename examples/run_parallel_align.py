@@ -655,9 +655,9 @@ def evaluate(args, model: PreTrainedModel, tokenizer: PreTrainedTokenizer, prefi
         nb_eval_steps += 1
 
     eval_loss = eval_loss / nb_eval_steps
-    perplexity = torch.exp(torch.tensor(eval_loss))
+    # perplexity = torch.exp(torch.tensor(eval_loss))
 
-    result = {"perplexity": perplexity}
+    result = {"loss": eval_loss}
 
     output_eval_file = os.path.join(eval_output_dir, prefix, "eval_results.txt")
     with open(output_eval_file, "w") as writer:
