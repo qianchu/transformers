@@ -293,7 +293,7 @@ def convert_examples_to_features(
 
 def get_labels(path: str) -> List[str]:
     if path:
-        with open(path, "r") as f:
+        with open(path, "r",encoding='utf-8') as f:
             labels = f.read().splitlines()
         if "O" not in labels:
             labels = ["O"] + labels

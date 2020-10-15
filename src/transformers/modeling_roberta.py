@@ -470,7 +470,7 @@ class RobertaForParaAlign(BertPreTrainedModel):
     config_class = RobertaConfig
     pretrained_model_archive_map = ROBERTA_PRETRAINED_MODEL_ARCHIVE_MAP
     base_model_prefix = "roberta"
-
+ 
     def __init__(self, config):
         super().__init__(config)
         self.num_labels = config.num_labels
@@ -481,6 +481,8 @@ class RobertaForParaAlign(BertPreTrainedModel):
 
         self.init_weights()
         # self.classifier = RobertaClassificationHead(config)
+        from pytorch_metric_learning import losses
+        self.loss_func = losses.TripletMarginLoss()
 
     @add_start_docstrings_to_callable(ROBERTA_INPUTS_DOCSTRING)
     def forward(
@@ -551,8 +553,17 @@ class RobertaForParaAlign(BertPreTrainedModel):
             inputs_embeds=inputs_embeds,
         )
         
-        pooled_output_src = outputs_src[0][:,0,:]
-        pooled_output_tgt = outputs_tgt[0][:,0,:]
+        pooled_output_src = outputs_src[0][:,0,:]#.squeeze(1)
+        pooled_output_tgt = outputs_tgt[0][:,0,:]#.squeeze(1)
+        #print ('pooled output src size',outputs_src[0][:,0,:].size()) 
+        embeddings = torch.cat([pooled_output_src, pooled_output_tgt], dim=0)
+        labels = torch.arange(pooled_output_src.size(0))
+        labels = torch.cat([labels, labels], dim=0)
+
+        loss = self.loss_func(embeddings, labels)
+        return loss
+
+        """
         # pooled_output=torch.cat((pooled_output_w1,pooled_output_w2),1)
         # sequence_output = outputs[0]
         pooled_output = self.dropout(pooled_output)
@@ -571,6 +582,7 @@ class RobertaForParaAlign(BertPreTrainedModel):
             outputs = (loss,) + outputs
 
         return outputs  # (loss), logits, (hidden_states), (attentions)
+        """
 
 @add_start_docstrings(
     """Roberta Model with a multiple choice classification head on top (a linear layer on top of
