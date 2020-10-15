@@ -594,16 +594,31 @@ def evaluate(args, model: PreTrainedModel, tokenizer: PreTrainedTokenizer, prefi
 
     args.eval_batch_size = args.per_gpu_eval_batch_size * max(1, args.n_gpu)
     # Note that DistributedSampler samples randomly
+    def collate(examples):
+        src_id,tgt_id,src_am,tgt_am=list(zip(*examples))
+        # print (src_id)
+        src_id,tgt_id,src_am,tgt_am=torch.stack(src_id),torch.stack(tgt_id),torch.stack(src_am),torch.stack(tgt_am)
+        # padding_value = 0 if tokenizer._pad_token is None else tokenizer.pad_token_id
+        # input_ids_src = pad_sequence(src_examples, batch_first=True, padding_value=padding_value)
+        # input_ids_tgt = pad_sequence(tgt_examples, batch_first=True, padding_value=padding_value)
+        # max_length = input_ids.shape[1]
+        # attention_mask_src = torch.stack(
+        #     [torch.cat([torch.ones(len(t), dtype=torch.long), torch.zeros(max_length - len(t), dtype=torch.long)]) for t
+        #      in src_examples])
+        # attention_mask_tgt = torch.stack(
+        #     [torch.cat([torch.ones(len(t), dtype=torch.long), torch.zeros(max_length - len(t), dtype=torch.long)]) for t
+        #      in tgt_examples])
 
-    def collate(examples: List[torch.Tensor]):
-        padding_value = 0 if tokenizer._pad_token is None else tokenizer.pad_token_id
-        input_ids=pad_sequence(examples, batch_first=True,padding_value=padding_value)
-        max_length = input_ids.shape[1]
-        attention_mask = torch.stack(
-            [torch.cat([torch.ones(len(t), dtype=torch.long), torch.zeros(max_length - len(t), dtype=torch.long)]) for t
-             in examples])
+        return src_id,tgt_id,src_am,tgt_am
+    # def collate(examples: List[torch.Tensor]):
+    #     padding_value = 0 if tokenizer._pad_token is None else tokenizer.pad_token_id
+    #     input_ids=pad_sequence(examples, batch_first=True,padding_value=padding_value)
+    #     max_length = input_ids.shape[1]
+    #     attention_mask = torch.stack(
+    #         [torch.cat([torch.ones(len(t), dtype=torch.long), torch.zeros(max_length - len(t), dtype=torch.long)]) for t
+    #          in examples])
 
-        return input_ids, attention_mask
+    #     return input_ids, attention_mask
         # if tokenizer._pad_token is None:
         #     max_length = input_ids.shape[1]
         #     attention_mask = torch.stack(
@@ -631,16 +646,12 @@ def evaluate(args, model: PreTrainedModel, tokenizer: PreTrainedTokenizer, prefi
     model.eval()
 
     for batch in tqdm(eval_dataloader, desc="Evaluating"):
-        inputs,attention_mask=batch
-        inputs, labels = mask_tokens(inputs, tokenizer, args) if args.mlm else (inputs, inputs)
-        inputs = inputs.to(args.device)
-        labels = labels.to(args.device)
-        attention_mask=attention_mask.to(args.device)
-
+        inputs_src,inputs_tgt,attention_mask_src,attention_mask_tgt=batch
+        inputs_src,inputs_tgt = inputs_src.to(args.device),inputs_tgt.to(args.device)
+        attention_mask_src,attention_mask_tgt=attention_mask_src.to(args.device),attention_mask_tgt.to(args.device)
         with torch.no_grad():
-            outputs = model(inputs, masked_lm_labels=labels,attention_mask=attention_mask) if args.mlm else model(inputs, attention_mask=attention_mask,labels=labels)
-            lm_loss = outputs[0]
-            eval_loss += lm_loss.mean().item()
+            loss = model(input_ids_src=inputs_src, input_ids_tgt=inputs_tgt,attention_mask_src=attention_mask_src,attention_mask_tgt=attention_mask_tgt) 
+            eval_loss += loss.mean().item()
         nb_eval_steps += 1
 
     eval_loss = eval_loss / nb_eval_steps
