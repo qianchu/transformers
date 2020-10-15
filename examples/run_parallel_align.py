@@ -111,11 +111,12 @@ class TextDataset(Dataset):
 
 class LineByLineTextDataset(Dataset):
     def __init__(self, tokenizer: PreTrainedTokenizer, args, file_path: str, file_para_path,block_size=512):
-        assert os.path.isfile(file_path)
-        # Here, we do not cache the features, operating under the assumption
-        # that we will soon use fast multithreaded tokenizers from the
-        # `tokenizers` repo everywhere =)
-        logger.info("Creating features from dataset file at %s", file_path)
+        if not file_para_path:
+            assert os.path.isfile(file_path)
+            # Here, we do not cache the features, operating under the assumption
+            # that we will soon use fast multithreaded tokenizers from the
+            # `tokenizers` repo everywhere =)
+            logger.info("Creating features from dataset file at %s", file_path)
 
         # examples=self.produce_tokens(tokenizer, args, file_path, block_size)
         # positions_ids=self.produce_position_ids(examples)
