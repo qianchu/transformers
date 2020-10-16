@@ -9,6 +9,12 @@ __pycache__/
 # C extensions
 *.so
 
+# tests and logs
+tests/fixtures
+logs/
+lightning_logs/
+lang_code_data/
+
 # Distribution / packaging
 .Python
 build/
@@ -117,6 +123,7 @@ dmypy.json
 .pyre/
 
 # vscode
+.vs
 .vscode
 
 # Pycharm
@@ -132,7 +139,10 @@ proc_data
 # examples
 runs
 /runs_old
-examples/runs
+/wandb
+/examples/runs
+/examples/**/*.args
+/examples/rag/sweep
 
 # data
 /data
