@@ -44,7 +44,7 @@ from transformers import (
     XLMForSequenceClassification,
     XLMTokenizer,
     get_linear_schedule_with_warmup,
-    RobertaConfig, RobertaForSequenceClassification,RobertaTokenizer,RobertaForSequenceTokenClassification
+    RobertaConfig, RobertaForSequenceClassification,RobertaTokenizer,RobertaForSequenceTokenClassification,
     XLMRobertaConfig, XLMRobertaForSequenceClassification,XLMRobertaTokenizer, XLMRobertaForSequenceTokenClassification
 
 )
