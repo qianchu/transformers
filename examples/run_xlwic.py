@@ -44,6 +44,7 @@ from transformers import (
     XLMForSequenceClassification,
     XLMTokenizer,
     get_linear_schedule_with_warmup,
+    RobertaConfig, RobertaForSequenceClassification,RobertaTokenizer,RobertaForSequenceTokenClassification
     XLMRobertaConfig, XLMRobertaForSequenceClassification,XLMRobertaTokenizer, XLMRobertaForSequenceTokenClassification
 
 )
@@ -70,6 +71,7 @@ MODEL_CLASSES = {
     "xlm": (XLMConfig, XLMForSequenceClassification, XLMTokenizer),
     "distilbert": (DistilBertConfig, DistilBertForSequenceClassification, DistilBertTokenizer),
     'xlm-r':(XLMRobertaConfig, XLMRobertaForSequenceTokenClassification,XLMRobertaTokenizer),
+    'roberta':(RobertaConfig, RobertaForSequenceTokenClassification,RobertaTokenizer)
 }
 
 
