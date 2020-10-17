@@ -75,6 +75,16 @@ MODEL_CLASSES = {
 }
 
 
+def label2output(label,flag):
+    if flag=='wic':
+        if label==0:
+            return 'F'
+        elif label==1:
+            return 'T'
+    elif flag=='xl-wic':
+       return label
+
+
 def set_seed(args):
     random.seed(args.seed)
     np.random.seed(args.seed)
@@ -427,6 +437,7 @@ def eval_predict(args, model, tokenizer, dev_result,testset='test',prefix=""):
         eval_loss = eval_loss / nb_eval_steps
         if args.output_mode == "classification":
             preds = np.argmax(preds, axis=1)
+            
         else:
             raise ValueError("No other `output_mode` for XLWIC.")
         result = compute_metrics(eval_task, preds, out_label_ids)
@@ -440,7 +451,7 @@ def eval_predict(args, model, tokenizer, dev_result,testset='test',prefix=""):
                 writer.write("%s = %s\n" % (testset+'-'+key, str(result[key])))
         with open(output_eval_file+str(dev_result),'w') as writer:
             for pred in preds:
-                writer.write(pred+'\n')
+                writer.write(str(label2output(pred,'wic'))+'\n')
     return results
 
 def load_and_cache_examples(args, task, tokenizer, evaluate=False,testset='test'):

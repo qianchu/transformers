@@ -71,7 +71,7 @@ class XlwicProcessor(DataProcessor):
 
     def get_labels(self):
         """See base class."""
-        return ["T","F"]
+        return ["F","T"]
 
 
 xlwic_processors = {
