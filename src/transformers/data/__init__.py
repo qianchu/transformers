@@ -22,7 +22,9 @@ from .processors import (
     xnli_tasks_num_labels,
     xlwic_output_modes,
     xlwic_processors,
-    xlwic_tasks_num_labels
+    xlwic_tasks_num_labels,
+    xlwic_convert_examples_to_features,
+
 )
 
 
