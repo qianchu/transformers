@@ -1148,7 +1148,7 @@ class BertForSequenceTokenClassification(BertPreTrainedModel):
             head_mask=head_mask,
             inputs_embeds=inputs_embeds,
         )
-         outputs1 = self.bert(
+        outputs1 = self.bert(
             input_ids_b,
             attention_mask=attention_mask_b,
             token_type_ids=token_type_ids,
