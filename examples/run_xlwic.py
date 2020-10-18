@@ -113,8 +113,8 @@ def find_token_id(input_id,tokenizer):
             if input_id[i+1]!=tokenizer.sep_token_id and input_id[i+1]!=tokenizer.pad_token_id:
                 token_ids_alter.append(i+1)
 
-    print('token id alter',token_ids_alter)
-    print('token ids',token_ids)
+    # print('token id alter',token_ids_alter)
+    # print('token ids',token_ids)
     try:
         assert len(token_ids_alter)==2
     except AssertionError as e:
