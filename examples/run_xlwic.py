@@ -274,11 +274,11 @@ def train(args, train_dataset, model, tokenizer):
                     if (
                         args.local_rank == -1 and args.evaluate_during_training
                     ):  # Only evaluate when single GPU otherwise metrics may not average well
-                        dev_results = evaluate(args, model, tokenizer,testset='dev')
+                        dev_results = evaluate(args, model, tokenizer,testset='valid')
                         # results = evaluate(args, model, tokenizer,testset='test_hard')
                         # results = evaluate(args, model, tokenizer,testset='test_easy')
-                        results = evaluate(args, model, tokenizer)
-                        results=eval_predict(args,model,tokenizer,dev_result=str(dev_results['acc']))
+                        # results = evaluate(args, model, tokenizer)
+                        results=eval_predict(args,model,tokenizer,dev_result=str(dev_results['acc']),flag='xl-wic')
                         for key, value in results.items():
                             tb_writer.add_scalar("eval_{}".format(key), value, global_step)
                     tb_writer.add_scalar("lr", scheduler.get_lr()[0], global_step)
@@ -384,7 +384,7 @@ def evaluate(args, model, tokenizer, testset='test',prefix=""):
     return results
 
 
-def eval_predict(args, model, tokenizer, dev_result,testset='test',prefix=""):
+def eval_predict(args, model, tokenizer, dev_result,testset='test',prefix="",flag='wic'):
     eval_task_names = (args.task_name,)
     eval_outputs_dirs = (args.output_dir,)
 
@@ -451,7 +451,7 @@ def eval_predict(args, model, tokenizer, dev_result,testset='test',prefix=""):
                 writer.write("%s = %s\n" % (testset+'-'+key, str(result[key])))
         with open(output_eval_file+str(dev_result),'w') as writer:
             for pred in preds:
-                writer.write(str(label2output(pred,'wic'))+'\n')
+                writer.write(str(label2output(pred,flag))+'\n')
     return results
 
 def load_and_cache_examples(args, task, tokenizer, evaluate=False,testset='test'):
