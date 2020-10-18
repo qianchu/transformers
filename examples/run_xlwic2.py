@@ -521,16 +521,27 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False,testset='test'
     # Convert to Tensors and build dataset
     all_input_ids_a = torch.tensor([f.input_ids_a for f in features], dtype=torch.long)
     all_input_ids_b = torch.tensor([f.input_ids_b for f in features], dtype=torch.long)
+    print ('before all input ids a',all_input_ids_a[0])
+    print ('before all input ids b',all_input_ids_a[0])
+
     all_attention_mask_a = torch.tensor([f.attention_mask_a for f in features], dtype=torch.long)
     all_attention_mask_b = torch.tensor([f.attention_mask_b for f in features], dtype=torch.long)
+    print ('before all am a',all_attention_mask_a[0])
+    print ('before all am b',all_attention_mask_b[0])
 
     all_token_ids_a=torch.tensor([find_token_id(f.input_ids_a,tokenizer) for f in features], dtype=torch.long)
     all_token_ids_b=torch.tensor([find_token_id(f.input_ids_b,tokenizer) for f in features], dtype=torch.long)
+    print ('token id a',all_token_ids_a[0])
+    print ('token id b',all_token_ids_b[0])
 
     all_input_ids_a=torch.tensor([delete_tokenmark_input(f.input_ids_a,tokenizer) for f in features], dtype=torch.long)
     all_input_ids_b=torch.tensor([delete_tokenmark_input(f.input_ids_b,tokenizer) for f in features], dtype=torch.long)
     all_attention_mask_a=torch.tensor([delete_tokenmarker_am(f.input_ids_a,tokenizer) for f in features], dtype=torch.long)
     all_attention_mask_b=torch.tensor([delete_tokenmarker_am(f.input_ids_a,tokenizer) for f in features], dtype=torch.long)
+    print ('after all input ids a',all_input_ids_a[0])
+    print ('after all input ids b',all_input_ids_a[0])
+    print ('after all am a',all_attention_mask_a[0])
+    print ('after all am b',all_attention_mask_b[0])
 
     # all_attention_mask = torch.tensor([f.attention_mask for f in features], dtype=torch.long)
     # all_token_type_ids = torch.tensor([f.token_type_ids if type(f.token_type_ids)!=type(None) else [0]*len(f.attention_mask) for f in features], dtype=torch.long)
