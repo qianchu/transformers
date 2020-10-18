@@ -1087,14 +1087,17 @@ class BertForSequenceTokenClassification(BertPreTrainedModel):
     @add_start_docstrings_to_callable(BERT_INPUTS_DOCSTRING)
     def forward(
         self,
-        input_ids=None,
-        attention_mask=None,
+        input_ids_a=None,
+        input_ids_b=None
+        attention_mask_a=None,
+        attention_mask_b=None,
         token_type_ids=None,
         position_ids=None,
         head_mask=None,
         inputs_embeds=None,
         labels=None,
-        token_ids=None
+        token_ids_a=None
+        token_ids_b=None
     ):
         r"""
         labels (:obj:`torch.LongTensor` of shape :obj:`(batch_size,)`, `optional`, defaults to :obj:`None`):
@@ -1137,21 +1140,29 @@ class BertForSequenceTokenClassification(BertPreTrainedModel):
 
         """
 
-        outputs = self.bert(
-            input_ids,
-            attention_mask=attention_mask,
+        outputs0 = self.bert(
+            input_ids_a,
+            attention_mask=attention_mask_a,
+            token_type_ids=token_type_ids,
+            position_ids=position_ids,
+            head_mask=head_mask,
+            inputs_embeds=inputs_embeds,
+        )
+         outputs1 = self.bert(
+            input_ids_b,
+            attention_mask=attention_mask_b,
             token_type_ids=token_type_ids,
             position_ids=position_ids,
             head_mask=head_mask,
             inputs_embeds=inputs_embeds,
         )
         try:
-            pooled_output_w1 = outputs[0][range(outputs[0].size()[0]),token_ids[:,0],:]
+            pooled_output_w1 = outputs0[range(outputs0.size()[0]),token_ids_a[:,0],:]
         except TypeError as e:
             print ('Warning: Nonetype token ids',e)
             print (outputs[0].size())
             print (token_ids)
-        pooled_output_w2 = outputs[0][range(outputs[0].size()[0]),token_ids[:,1],:]
+        pooled_output_w2 = outputs1[range(outputs1.size()[0]),token_ids_b[:,0],:]
         pooled_output=torch.cat((pooled_output_w1,pooled_output_w2),1)
         pooled_output = self.dropout(pooled_output)
         logits = self.classifier(pooled_output)

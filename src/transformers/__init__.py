@@ -64,6 +64,7 @@ from .data import (
     SquadV1Processor,
     SquadV2Processor,
     glue_convert_examples_to_features,
+    xlwic_convert_examples_to_features,
     glue_output_modes,
     glue_processors,
     glue_tasks_num_labels,
