@@ -109,7 +109,7 @@ def delete_tokenmarker_am(input_ids,tokenizer):
         if i==tokenizer.pad_token_id:
             am_new.append(0)
         else:
-            am_new.apend(1)
+            am_new.append(1)
     return am_new
 
 # def delete_tokenmaker_tokentypeids(input_ids,tokenizer):
