@@ -69,9 +69,9 @@ class InputFeatures:
             float for regression problems.
     """
 
-    input_ids: OptionalList[int]=None
-    input_ids_a: OptionalList[int]=None
-    input_ids_b: OptionalList[int]=None
+    input_ids: Optional[List[int]] = None
+    input_ids_a: Optional[List[int]] = None
+    input_ids_b: Optional[List[int]] = None
     attention_mask_a: Optional[List[int]] = None
     attention_mask_b: Optional[List[int]] = None
     attention_mask: Optional[List[int]] = None
