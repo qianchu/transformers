@@ -74,6 +74,14 @@ MODEL_CLASSES = {
     'roberta':(RobertaConfig, RobertaForSequenceTokenClassification,RobertaTokenizer)
 }
 
+def label2output(label,flag):
+    if flag=='wic':
+        if label==0:
+            return 'F'
+        elif label==1:
+            return 'T'
+    elif flag=='xl-wic':
+       return label
 
 def set_seed(args):
     random.seed(args.seed)
@@ -260,11 +268,11 @@ def train(args, train_dataset, model, tokenizer):
 
             model.train()
             batch = tuple(t.to(args.device) for t in batch)
-            inputs = {"input_ids": batch[0], "attention_mask": batch[1], "labels": batch[3]}
-            if args.model_type != "distilbert":
-                inputs["token_type_ids"] = (
-                    batch[2] if args.model_type in ["bert"] else None
-                )  # XLM and DistilBERT don't use segment_ids
+            inputs = {"input_ids_a": batch[0], 'attention_mask_a',batch[1],"token_ids_a": batch[2], "input_ids_b":batch[3],"attention_mask_b":batch[4],"token_ids_b":batch[5],"labels": batch[6]}
+            # if args.model_type != "distilbert":
+            #     inputs["token_type_ids"] = (
+            #         batch[2] if args.model_type in ["bert"] else None
+            #     )  # XLM and DistilBERT don't use segment_ids
             outputs = model(**inputs)
             loss = outputs[0]  # model outputs are always tuple in transformers (see doc)
 
@@ -296,10 +304,11 @@ def train(args, train_dataset, model, tokenizer):
                     if (
                         args.local_rank == -1 and args.evaluate_during_training
                     ):  # Only evaluate when single GPU otherwise metrics may not average well
-                        results = evaluate(args, model, tokenizer,testset='dev')
+                        dev_results = evaluate(args, model, tokenizer,testset='valid')
                         # results = evaluate(args, model, tokenizer,testset='test_hard')
                         # results = evaluate(args, model, tokenizer,testset='test_easy')
-                        results = evaluate(args, model, tokenizer)
+                        # results = evaluate(args, model, tokenizer)
+                        results=eval_predict(args,model,tokenizer,dev_result=str(dev_results['acc']),flag='xl-wic')
                         for key, value in results.items():
                             tb_writer.add_scalar("eval_{}".format(key), value, global_step)
                     tb_writer.add_scalar("lr", scheduler.get_lr()[0], global_step)
@@ -370,11 +379,11 @@ def evaluate(args, model, tokenizer, testset='test',prefix=""):
             batch = tuple(t.to(args.device) for t in batch)
 
             with torch.no_grad():
-                inputs = {"input_ids": batch[0], "attention_mask": batch[1], "labels": batch[3]}
-                if args.model_type != "distilbert":
-                    inputs["token_type_ids"] = (
-                        batch[2] if args.model_type in ["bert"] else None
-                    )  # XLM and DistilBERT don't use segment_ids
+                inputs = {"input_ids_a": batch[0], 'attention_mask_a',batch[1],"token_ids_a": batch[2], "input_ids_b":batch[3],"attention_mask_b":batch[4],"token_ids_b":batch[5],"labels": batch[6]}
+                # if args.model_type != "distilbert":
+                #     inputs["token_type_ids"] = (
+                #         batch[2] if args.model_type in ["bert"] else None
+                #     )  # XLM and DistilBERT don't use segment_ids
                 outputs = model(**inputs)
                 tmp_eval_loss, logits = outputs[:2]
 
@@ -404,6 +413,75 @@ def evaluate(args, model, tokenizer, testset='test',prefix=""):
 
     return results
 
+def eval_predict(args, model, tokenizer, dev_result,testset='test',prefix="",flag='wic'):
+    eval_task_names = (args.task_name,)
+    eval_outputs_dirs = (args.output_dir,)
+
+    results = {}
+    for eval_task, eval_output_dir in zip(eval_task_names, eval_outputs_dirs):
+        eval_dataset = load_and_cache_examples(args, eval_task, tokenizer, evaluate=True,testset=testset)
+
+        if not os.path.exists(eval_output_dir) and args.local_rank in [-1, 0]:
+            os.makedirs(eval_output_dir)
+
+        args.eval_batch_size = args.per_gpu_eval_batch_size * max(1, args.n_gpu)
+        # Note that DistributedSampler samples randomly
+        eval_sampler = SequentialSampler(eval_dataset)
+        eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler, batch_size=args.eval_batch_size)
+
+        # multi-gpu eval
+        if args.n_gpu > 1 and not isinstance(model, torch.nn.DataParallel):
+            model = torch.nn.DataParallel(model)
+
+        # Eval!
+        logger.info("***** Running evaluation {} *****".format(prefix))
+        logger.info("  Num examples = %d", len(eval_dataset))
+        logger.info("  Batch size = %d", args.eval_batch_size)
+        eval_loss = 0.0
+        nb_eval_steps = 0
+        preds = None
+        out_label_ids = None
+        for batch in tqdm(eval_dataloader, desc="Evaluating"):
+            model.eval()
+            batch = tuple(t.to(args.device) for t in batch)
+
+            with torch.no_grad():
+                inputs = {"input_ids": batch[0], "attention_mask": batch[1], "labels": batch[3]}
+                if args.model_type != "distilbert":
+                    inputs["token_type_ids"] = (
+                        batch[2] if args.model_type in ["bert"] else None
+                    )  # XLM and DistilBERT don't use segment_ids
+                outputs = model(**inputs,token_ids=batch[4])
+                tmp_eval_loss, logits = outputs[:2]
+
+                eval_loss += tmp_eval_loss.mean().item()
+            nb_eval_steps += 1
+            if preds is None:
+                preds = logits.detach().cpu().numpy()
+                out_label_ids = inputs["labels"].detach().cpu().numpy()
+            else:
+                preds = np.append(preds, logits.detach().cpu().numpy(), axis=0)
+                out_label_ids = np.append(out_label_ids, inputs["labels"].detach().cpu().numpy(), axis=0)
+
+        eval_loss = eval_loss / nb_eval_steps
+        if args.output_mode == "classification":
+            preds = np.argmax(preds, axis=1)
+            
+        else:
+            raise ValueError("No other `output_mode` for XLWIC.")
+        result = compute_metrics(eval_task, preds, out_label_ids)
+        results.update(result)
+
+        output_eval_file = os.path.join(eval_output_dir, prefix, "eval_results.txt")
+        with open(output_eval_file, "w") as writer:
+            logger.info("***** Eval results {} *****".format(prefix))
+            for key in sorted(result.keys()):
+                logger.info("  %s = %s", testset+'-'+key, str(result[key]))
+                writer.write("%s = %s\n" % (testset+'-'+key, str(result[key])))
+        with open(output_eval_file+str(dev_result),'w') as writer:
+            for pred in preds:
+                writer.write(str(label2output(pred,flag))+'\n')
+    return results
 
 def load_and_cache_examples(args, task, tokenizer, evaluate=False,testset='test'):
     if args.local_rank not in [-1, 0] and not evaluate:
