@@ -112,11 +112,10 @@ def delete_tokenmarker_am(input_ids,tokenizer):
             am_new.apend(1)
     return am_new
 
-def delete_tokenmaker_tokentypeids(input_ids,tokenizer):
-    token_ids=[]
-    for i in input_ids:
-        if i==tokenizer
-    pass
+# def delete_tokenmaker_tokentypeids(input_ids,tokenizer):
+#     token_ids=[]
+#     for i in input_ids:
+#     pass
 
 def find_token_id(input_id,tokenizer):
     token_pos_start_id=tokenizer.encode('[',add_special_tokens=False)[0]
