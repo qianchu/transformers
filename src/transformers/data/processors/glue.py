@@ -196,7 +196,7 @@ def xlwic_convert_examples_to_features(
         inputs={}
         for k in batch_encoding_a:
             inputs[k+'_a']=batch_encoding_a[k][i]
-            inputs[k_'_b']=batch_encoding_b[k][i]
+            inputs[k+'_b']=batch_encoding_b[k][i]
 
         feature = InputFeatures(**inputs, label=labels[i])
         features.append(feature)
