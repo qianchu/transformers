@@ -445,7 +445,7 @@ def eval_predict(args, model, tokenizer, dev_result,testset='test',prefix="",fla
             batch = tuple(t.to(args.device) for t in batch)
 
             with torch.no_grad():
-                inputs = {"input_ids": batch[0], "attention_mask": batch[1], "labels": batch[3]}
+                inputs = {"input_ids_a": batch[0], 'attention_mask_a':batch[1],"token_ids_a": batch[2], "input_ids_b":batch[3],"attention_mask_b":batch[4],"token_ids_b":batch[5],"labels": batch[6]}
                 if args.model_type != "distilbert":
                     inputs["token_type_ids"] = (
                         batch[2] if args.model_type in ["bert"] else None
