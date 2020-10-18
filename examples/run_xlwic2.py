@@ -90,7 +90,7 @@ def set_seed(args):
     if args.n_gpu > 0:
         torch.cuda.manual_seed_all(args.seed)
 
-def delete_tokenmark_input(input_ids,tokenizer):
+def delete_tokenmark_input(input_id,tokenizer):
     input_id_new=[]
     del_num=0
     token_pos_start_id=tokenizer.encode('[',add_special_tokens=False)[0]
