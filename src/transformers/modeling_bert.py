@@ -1168,7 +1168,7 @@ class BertForSequenceTokenClassification(BertPreTrainedModel):
         pooled_output = self.dropout(pooled_output)
         logits = self.classifier(pooled_output)
 
-        outputs = (logits,) + outputs[2:]  # add hidden states and attention if they are here
+        outputs = (logits,)  # add hidden states and attention if they are here
 
         if labels is not None:
             if self.num_labels == 1:
