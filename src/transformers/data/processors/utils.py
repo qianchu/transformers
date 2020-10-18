@@ -76,6 +76,9 @@ class InputFeatures:
     attention_mask_b: Optional[List[int]] = None
     attention_mask: Optional[List[int]] = None
     token_type_ids: Optional[List[int]] = None
+    token_type_ids_a: Optional[List[int]] = None
+    token_type_ids_b: Optional[List[int]] = None
+
     label: Optional[Union[int, float]] = None
 
     def to_json_string(self):
