@@ -450,7 +450,7 @@ def eval_predict(args, model, tokenizer, dev_result,testset='test',prefix="",fla
                     inputs["token_type_ids"] = (
                         batch[2] if args.model_type in ["bert"] else None
                     )  # XLM and DistilBERT don't use segment_ids
-                outputs = model(**inputs,token_ids=batch[4])
+                outputs = model(**inputs)
                 tmp_eval_loss, logits = outputs[:2]
 
                 eval_loss += tmp_eval_loss.mean().item()
