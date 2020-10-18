@@ -522,7 +522,7 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False,testset='test'
     all_input_ids_a = torch.tensor([f.input_ids_a for f in features], dtype=torch.long)
     all_input_ids_b = torch.tensor([f.input_ids_b for f in features], dtype=torch.long)
     print ('before all input ids a',all_input_ids_a[0])
-    print ('before all input ids b',all_input_ids_a[0])
+    print ('before all input ids b',all_input_ids_b[0])
 
     all_attention_mask_a = torch.tensor([f.attention_mask_a for f in features], dtype=torch.long)
     all_attention_mask_b = torch.tensor([f.attention_mask_b for f in features], dtype=torch.long)
@@ -539,7 +539,7 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False,testset='test'
     all_attention_mask_a=torch.tensor([delete_tokenmarker_am(f.input_ids_a,tokenizer) for f in features], dtype=torch.long)
     all_attention_mask_b=torch.tensor([delete_tokenmarker_am(f.input_ids_a,tokenizer) for f in features], dtype=torch.long)
     print ('after all input ids a',all_input_ids_a[0])
-    print ('after all input ids b',all_input_ids_a[0])
+    print ('after all input ids b',all_input_ids_b[0])
     print ('after all am a',all_attention_mask_a[0])
     print ('after all am b',all_attention_mask_b[0])
 
