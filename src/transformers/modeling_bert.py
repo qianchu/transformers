@@ -1088,7 +1088,7 @@ class BertForSequenceTokenClassification(BertPreTrainedModel):
     def forward(
         self,
         input_ids_a=None,
-        input_ids_b=None
+        input_ids_b=None,
         attention_mask_a=None,
         attention_mask_b=None,
         token_type_ids=None,
