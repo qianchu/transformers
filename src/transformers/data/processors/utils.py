@@ -70,6 +70,10 @@ class InputFeatures:
     """
 
     input_ids: List[int]
+    input_ids_a: List[int]
+    input_ids_b:List[int]
+    attention_mask_a: Optional[List[int]] = None
+    attention_mask_b: Optional[List[int]] = None
     attention_mask: Optional[List[int]] = None
     token_type_ids: Optional[List[int]] = None
     label: Optional[Union[int, float]] = None
