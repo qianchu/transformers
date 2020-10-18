@@ -446,10 +446,10 @@ def eval_predict(args, model, tokenizer, dev_result,testset='test',prefix="",fla
 
             with torch.no_grad():
                 inputs = {"input_ids_a": batch[0], 'attention_mask_a':batch[1],"token_ids_a": batch[2], "input_ids_b":batch[3],"attention_mask_b":batch[4],"token_ids_b":batch[5],"labels": batch[6]}
-                if args.model_type != "distilbert":
-                    inputs["token_type_ids"] = (
-                        batch[2] if args.model_type in ["bert"] else None
-                    )  # XLM and DistilBERT don't use segment_ids
+                # if args.model_type != "distilbert":
+                #     inputs["token_type_ids"] = (
+                #         batch[2] if args.model_type in ["bert"] else None
+                #     )  # XLM and DistilBERT don't use segment_ids
                 outputs = model(**inputs)
                 tmp_eval_loss, logits = outputs[:2]
 
