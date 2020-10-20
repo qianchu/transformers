@@ -74,7 +74,44 @@ MODEL_CLASSES = {
     'roberta':(RobertaConfig, RobertaForSequenceTokenClassification,RobertaTokenizer)
 }
 
+def delete_tokenmark_input(input_ids,tokenizer):
+    input_id_new=[]
+    del_num=0
+    token_pos_start_id=tokenizer.encode('[',add_special_tokens=False)[0]
+    token_pos_end_id=tokenizer.encode(']',add_special_tokens=False)[0]
+    for i,input_i in enumerate(input_id):
+        if input_i not in [token_pos_start_id,token_pos_end_id]:
+            input_id_new.append(input_i)
+        else:
+            del_num+=1
+    input_id_new+=del_num*[tokenizer.pad_token_id]
+    return input_id_new
 
+def delete_tokenmarker_am(input_ids,tokenizer):
+    am_new=[]
+    for i in input_ids:
+        if i==tokenizer.pad_token_id:
+            am_new.append(0)
+        else:
+            am_new.apend(1)
+    return am_new
+
+def delete_tokenmaker_tokentypeids(input_ids,tokenizer):
+    tokentype_ids=[]
+    item=0
+    if args.model_type=='bert':
+        for i in input_ids:
+         
+            if i==tokenizer.pad_token_id:
+                tokentype_ids.append(0)
+            
+            elif i==tokenizer.sep_token_id:
+                tokentype_ids.append(item)
+                item=1
+            else:
+                tokentype_ids.append(item)  
+    else:
+        return None
 def label2output(label,flag):
     if flag=='wic':
         if label==0:
@@ -115,21 +152,26 @@ def find_token_id(input_id,tokenizer):
 
     # print('token id alter',token_ids_alter)
     # print('token ids',token_ids)
+    token_ids_alter[1]=token_ids_alter[1]-2
     try:
         assert len(token_ids_alter)==2
     except AssertionError as e:
         print ('Warning, token id alter is not length 2')
         print (input_id)
         print (token_ids_alter)
+        sys.exit(1)
     if len(token_ids)<2:
         print('[ token id ',token_pos_start_id)
         print("Warning: [ out of sentence {0} {1}".format(input_id,token_ids))
         token_ids=token_ids_alter
-    elif len(token_ids)>2:
-        print (input_id)
-        print('[ token id ',token_pos_start_id)
-        print('Warning: more than two [',token_ids)
-        token_ids=token_ids[:2]
+    else:
+        token_ids[1]=token_ids[1]-3
+        token_ids[0]=token_ids[0]-1
+        if len(token_ids)>2:
+            print (input_id)
+            print('[ token id ',token_pos_start_id)
+            print('Warning: more than two [',token_ids)
+            token_ids=token_ids[:2]
     try:
         assert token_ids
         assert len(token_ids)==2
@@ -492,9 +534,21 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False,testset='test'
 
     # Convert to Tensors and build dataset
     all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
+    print ('before all input ids',all_input_ids[0])
+    
+    # all_attention_mask = torch.tensor([f.attention_mask for f in features], dtype=torch.long)
+    # print ('before all am ',all_attention_mask[0])
+    # all_token_type_ids = torch.tensor([f.token_type_ids if type(f.token_type_ids)!=type(None) else [0]*len(f.attention_mask) for f in features], dtype=torch.long)
+    # print ('before all token_type_ids ',all_token_type_ids[0])
     all_token_ids=torch.tensor([find_token_id(f.input_ids,tokenizer) for f in features], dtype=torch.long)
-    all_attention_mask = torch.tensor([f.attention_mask for f in features], dtype=torch.long)
-    all_token_type_ids = torch.tensor([f.token_type_ids if type(f.token_type_ids)!=type(None) else [0]*len(f.attention_mask) for f in features], dtype=torch.long)
+    print ('all token ids',all_token_ids[0])
+    all_input_ids=torch.tensor([delete_tokenmark_input(f.input_ids,tokenizer) for f in features], dtype=torch.long)
+    print ('after all input ids',all_input_ids[0])
+    all_attention_mask=torch.tensor([delete_tokenmarker_am(f.input_ids,tokenizer) for f in features], dtype=torch.long)
+    print ('after all attention mask',all_attention_mask[0])
+    all_token_type_ids=torch.tensor([delete_tokenmaker_tokentypeids(f.input_ids,tokenizer) for f in features], dtype=torch.long)
+    print ('after all token type ids',all_token_type_ids[0])
+
     if output_mode == "classification":
         all_labels = torch.tensor([f.label for f in features], dtype=torch.long)
     else:
