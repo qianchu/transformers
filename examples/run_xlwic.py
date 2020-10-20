@@ -109,6 +109,7 @@ def delete_tokenmaker_tokentypeids(input_ids,tokenizer):
             item=1
         else:
             tokentype_ids.append(item)  
+    return tokentype_ids
    
 def label2output(label,flag):
     if flag=='wic':
