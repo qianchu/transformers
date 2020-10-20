@@ -279,10 +279,12 @@ def train(args, train_dataset, model, tokenizer):
             model.train()
             batch = tuple(t.to(args.device) for t in batch)
             inputs = {"input_ids": batch[0], "attention_mask": batch[1], "labels": batch[3]}
+            print ('args.mode_type',args.model_type)
             if args.model_type != "distilbert":
                 inputs["token_type_ids"] = (
                     batch[2] if args.model_type in ["bert"] else None
                 )  # XLM and DistilBERT don't use segment_ids
+            print ('token_type_ids',inputs["token_type_ids"])
             outputs = model(**inputs,token_ids=batch[4])
             loss = outputs[0]  # model outputs are always tuple in transformers (see doc)
 
