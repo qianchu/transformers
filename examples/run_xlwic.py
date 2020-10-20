@@ -79,7 +79,7 @@ def delete_tokenmark_input(input_ids,tokenizer):
     del_num=0
     token_pos_start_id=tokenizer.encode('[',add_special_tokens=False)[0]
     token_pos_end_id=tokenizer.encode(']',add_special_tokens=False)[0]
-    for i,input_i in enumerate(input_id):
+    for i,input_i in enumerate(input_ids):
         if input_i not in [token_pos_start_id,token_pos_end_id]:
             input_id_new.append(input_i)
         else:
