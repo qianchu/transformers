@@ -1,5 +1,24 @@
-use 'updated2' branch
 
+## Extract features
+
+export model=bert-large-cased
+python3 examples/extract_features.py \
+--input_file ${input_file}\
+--max_seq_length 256\
+--layers 12\
+--model $model\
+--model_type $model\ 
+--gpu 0\ 
+--batch_size 20\
+
+The features will be stored in hdf5 file: $input_file$.$model$.ly-12.hdf5. The file will have sentences as keys and list of layer-average word representations as values. You can also convert the hdf5 files into npy by:
+
+python3 examples/hdf5_to_json.py ${input_file}.${model}.ly-12.hdf5
+
+The npy file will be ${input_file}.${model}.ly-12.hdf5.npy
+
+
+------------------------
 <p align="center">
     <br>
     <img src="https://raw.githubusercontent.com/huggingface/transformers/master/docs/source/imgs/transformers_logo_name.png" width="400"/>
