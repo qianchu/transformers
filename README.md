@@ -1,7 +1,7 @@
 
 ## Extract features
 
-export model=bert-large-cased
+export model=bert-large-cased\
 python3 examples/extract_features.py \
 --input_file ${input_file}\
 --max_seq_length 256\
