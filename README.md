@@ -1,15 +1,15 @@
 
 ## Extract features
 
-export model=bert-large-cased\
-python3 examples/extract_features.py \
---input_file ${input_file}\
---max_seq_length 256\
---layers 12\
---model $model\
---model_type $model\ 
---gpu 0\ 
---batch_size 20\
+        export model=bert-large-cased\
+        python3 examples/extract_features.py \
+        --input_file ${input_file}\
+        --max_seq_length 256\
+        --layers 12\
+        --model ${model}\
+        --model_type ${model}\ 
+        --gpu 0\ 
+        --batch_size 20\
 
 The features will be stored in hdf5 file: $input_file$.$model$.ly-12.hdf5. The file will have sentences as keys and list of layer-average word representations as values. You can also convert the hdf5 files into npy by:
 
