@@ -463,7 +463,7 @@ def main():
                              "bert-large-uncased, bert-base-cased, bert-base-multilingual, bert-base-chinese.")
 
     ## Other parameters
-    parser.add_argument("--layers", default='1~13', type=int,help='sum over specific layers')
+    parser.add_argument("--layers", default='1~13', type=str,help='sum over specific layers')
     parser.add_argument("--max_seq_length", default=None, type=int,
                         help="The maximum total input sequence length after WordPiece tokenization. Sequences longer "
                             "than this will be truncated, and sequences shorter than this will be padded.")
