@@ -337,7 +337,9 @@ def examples2embeds(examples,tokenizer,model,device,writer,args):
             all_encoder_layers, _ = model(input_ids=input_ids, langs=langs, attention_mask=attention_mask)[-2:]
         else:
             all_encoder_layers,_=model(input_ids=input_ids,attention_mask=attention_mask)[-2:]
-        average_layer_batch = sum(all_encoder_layers[-args.layers:]) / args.layers
+        layer_start,layer_end=int(args.layers.split('~')[0]),int(args.layers.split('~')[1])
+        
+        average_layer_batch = sum(all_encoder_layers[layer_start:layer_end]) / (layer_end-layer_start)
         wembs_sent_batch=tokenemb2wemb(average_layer_batch.cpu().detach().numpy(),w2token_batch)
         for i,sent in enumerate(examples):
             sent=produce_key(sent)
@@ -461,7 +463,7 @@ def main():
                              "bert-large-uncased, bert-base-cased, bert-base-multilingual, bert-base-chinese.")
 
     ## Other parameters
-    parser.add_argument("--layers", default=12, type=int,help='sum over top num layers')
+    parser.add_argument("--layers", default='1~13', type=int,help='sum over specific layers')
     parser.add_argument("--max_seq_length", default=None, type=int,
                         help="The maximum total input sequence length after WordPiece tokenization. Sequences longer "
                             "than this will be truncated, and sequences shorter than this will be padded.")
