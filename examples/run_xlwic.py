@@ -130,7 +130,7 @@ def set_seed(args):
 
 def find_token_id(input_id,tokenizer):
     token_pos_start_id=tokenizer.encode('[',add_special_tokens=False)[0]
-    # token_pos_end_id=tokenizer.encode(']')
+    token_pos_end_id=tokenizer.encode(']')
     
     token_ids=[]
     token_ids_alter=[]
@@ -143,8 +143,10 @@ def find_token_id(input_id,tokenizer):
             token_ids_alter.append(i)
             # logger.info('first word alter',token_ids_alter)
         if input_i ==token_pos_start_id:
-            token_ids.append(i+1)
+            token_ids.append([i+1])
             # logger.info("first word",token_ids)
+        elif input_i==token_pos_end_id:
+            token_ids[-1].append(i)
         if input_i==tokenizer.sep_token_id:
             if input_id[i+1]!=tokenizer.sep_token_id and input_id[i+1]!=tokenizer.pad_token_id:
                 token_ids_alter.append(i+1)
@@ -164,8 +166,11 @@ def find_token_id(input_id,tokenizer):
         print("Warning: [ out of sentence {0} {1}".format(input_id,token_ids))
         token_ids=token_ids_alter
     else:
-        token_ids[1]=token_ids[1]-3
-        token_ids[0]=token_ids[0]-1
+        token_ids[1][0]=token_ids[1][0]-3
+        token_ids[1][1]=token_ids[1][1]-3
+
+        token_ids[0][0]=token_ids[0][0]-1
+        token_ids[0][1]=token_ids[0][1]-1
         if len(token_ids)>2:
             print (input_id)
             print('[ token id ',token_pos_start_id)
@@ -317,11 +322,11 @@ def train(args, train_dataset, model, tokenizer):
                     if (
                         args.local_rank == -1 and args.evaluate_during_training
                     ):  # Only evaluate when single GPU otherwise metrics may not average well
-                        dev_results = evaluate(args, model, tokenizer,testset='valid')
+                        dev_results = evaluate(args, model, tokenizer,testset=devname)
                         # results = evaluate(args, model, tokenizer,testset='test_hard')
                         # results = evaluate(args, model, tokenizer,testset='test_easy')
                         # results = evaluate(args, model, tokenizer)
-                        results=eval_predict(args,model,tokenizer,dev_result=str(dev_results['acc']),flag='xl-wic')
+                        results=eval_predict(args,model,tokenizer,dev_result=str(dev_results['acc']),flag=taskflag)
                         for key, value in results.items():
                             tb_writer.add_scalar("eval_{}".format(key), value, global_step)
                     tb_writer.add_scalar("lr", scheduler.get_lr()[0], global_step)
@@ -534,7 +539,7 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False,testset='test'
         torch.distributed.barrier()  # Make sure only the first process in distributed training process the dataset, and the others will use the cache
 
     # Convert to Tensors and build dataset
-    all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
+    # all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
     # print ('before all input ids',all_input_ids[0])
     
     # all_attention_mask = torch.tensor([f.attention_mask for f in features], dtype=torch.long)
@@ -695,7 +700,17 @@ def main():
     parser.add_argument("--local_rank", type=int, default=-1, help="For distributed training: local_rank")
     parser.add_argument("--server_ip", type=str, default="", help="For distant debugging.")
     parser.add_argument("--server_port", type=str, default="", help="For distant debugging.")
+    parser.add_argument("--task_name_spec",type=str,default='wic',help='wic task name')
     args = parser.parse_args()
+
+    devname='dev'
+    taskflag='wic'
+   
+    if args.task_name_spec=='xlwic':
+        devname='valid'
+        taskflag='xlwic'
+    elif args.task_name_spec=='amico':
+        taskflag='xlwic'
 
     if (
         os.path.exists(args.output_dir)
