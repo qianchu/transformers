@@ -324,11 +324,11 @@ def train(args, train_dataset, model, tokenizer):
                     if (
                         args.local_rank == -1 and args.evaluate_during_training
                     ):  # Only evaluate when single GPU otherwise metrics may not average well
-                        dev_results = evaluate(args, model, tokenizer,testset=devname)
+                        dev_results = evaluate(args, model, tokenizer,testset=args.devname)
                         # results = evaluate(args, model, tokenizer,testset='test_hard')
                         # results = evaluate(args, model, tokenizer,testset='test_easy')
                         # results = evaluate(args, model, tokenizer)
-                        results=eval_predict(args,model,tokenizer,dev_result=str(dev_results['acc']),flag=taskflag)
+                        results=eval_predict(args,model,tokenizer,dev_result=str(dev_results['acc']),flag=args.taskflag)
                         for key, value in results.items():
                             tb_writer.add_scalar("eval_{}".format(key), value, global_step)
                     tb_writer.add_scalar("lr", scheduler.get_lr()[0], global_step)
@@ -705,8 +705,8 @@ def main():
     parser.add_argument("--task_name_spec",type=str,default='wic',help='wic task name')
     args = parser.parse_args()
 
-    devname='dev'
-    taskflag='wic'
+    args.devname='dev'
+    args.taskflag='wic'
    
     if args.task_name_spec=='xlwic':
         devname='valid'
