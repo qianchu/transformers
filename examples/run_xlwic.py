@@ -143,10 +143,10 @@ def find_token_id(input_id,tokenizer):
             token_ids_alter.append(i)
             # logger.info('first word alter',token_ids_alter)
         if input_i ==token_pos_start_id:
-            token_ids.append([i+1])
+            token_ids.append(i+1)
             # logger.info("first word",token_ids)
-        elif input_i==token_pos_end_id:
-            token_ids[-1].append(i)
+        # elif input_i==token_pos_end_id:
+        #     token_ids[-1].append(i)
         if input_i==tokenizer.sep_token_id:
             if input_id[i+1]!=tokenizer.sep_token_id and input_id[i+1]!=tokenizer.pad_token_id:
                 token_ids_alter.append(i+1)
@@ -166,11 +166,13 @@ def find_token_id(input_id,tokenizer):
         print("Warning: [ out of sentence {0} {1}".format(input_id,token_ids))
         token_ids=token_ids_alter
     else:
-        token_ids[1][0]=token_ids[1][0]-3
-        token_ids[1][1]=token_ids[1][1]-3
+        token_ids[1]=token_ids[1]-3
+        token_ids[0]=token_ids[0]-1
+        # token_ids[1][0]=token_ids[1][0]-3
+        # token_ids[1][1]=token_ids[1][1]-3
 
-        token_ids[0][0]=token_ids[0][0]-1
-        token_ids[0][1]=token_ids[0][1]-1
+        # token_ids[0][0]=token_ids[0][0]-1
+        # token_ids[0][1]=token_ids[0][1]-1
         if len(token_ids)>2:
             print (input_id)
             print('[ token id ',token_pos_start_id)
