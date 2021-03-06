@@ -548,7 +548,7 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False,testset='test'
     # print ('before all am ',all_attention_mask[0])
     # all_token_type_ids = torch.tensor([f.token_type_ids if type(f.token_type_ids)!=type(None) else [0]*len(f.attention_mask) for f in features], dtype=torch.long)
     # print ('before all token_type_ids ',all_token_type_ids[0])
-    all_token_ids=torch.tensor([find_token_id(f.input_ids,tokenizer) for f in features], dtype=torch.long)
+    # all_token_ids=torch.tensor([find_token_id(f.input_ids,tokenizer) for f in features], dtype=torch.long)
     # print ('all token ids',all_token_ids[0])
     all_input_ids=torch.tensor([delete_tokenmark_input(f.input_ids,tokenizer) for f in features], dtype=torch.long)
     # print ('after all input ids',all_input_ids[0])
@@ -562,7 +562,7 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False,testset='test'
     else:
         raise ValueError("No other `output_mode` for XLWIC.")
 
-    dataset = TensorDataset(all_input_ids, all_attention_mask, all_token_type_ids, all_labels,all_token_ids)
+    dataset = TensorDataset(all_input_ids, all_attention_mask, all_token_type_ids, all_labels)
     return dataset
 
 
