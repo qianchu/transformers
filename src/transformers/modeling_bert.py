@@ -1186,7 +1186,7 @@ class BertForSequenceTokenLeftClassification(BertPreTrainedModel):
 
         self.bert = BertModel(config)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
-        self.classifier = nn.Linear(config.hidden_size, config.num_labels)
+        self.classifier = nn.Linear(config.hidden_size*2, config.num_labels)
 
         self.init_weights()
 
@@ -1259,6 +1259,7 @@ class BertForSequenceTokenLeftClassification(BertPreTrainedModel):
             print (token_ids)
         # pooled_output_w2 = outputs[0][range(outputs[0].size()[0]),token_ids[:,1],:]
         # pooled_output=torch.cat((pooled_output_w1,pooled_output_w2),1)
+        pooled_output=torch.cat((pooled_output,outputs[1]))
         pooled_output = self.dropout(pooled_output)
         logits = self.classifier(pooled_output)
 
