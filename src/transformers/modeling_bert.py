@@ -1259,7 +1259,7 @@ class BertForSequenceTokenLeftClassification(BertPreTrainedModel):
             print (token_ids)
         # pooled_output_w2 = outputs[0][range(outputs[0].size()[0]),token_ids[:,1],:]
         # pooled_output=torch.cat((pooled_output_w1,pooled_output_w2),1)
-        pooled_output=torch.cat((pooled_output,outputs[1]))
+        pooled_output=torch.cat((pooled_output,outputs[1]),1)
         pooled_output = self.dropout(pooled_output)
         logits = self.classifier(pooled_output)
 
