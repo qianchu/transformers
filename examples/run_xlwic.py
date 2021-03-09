@@ -552,9 +552,9 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False,testset='test'
     # print ('all token ids',all_token_ids[0])
     all_input_ids=torch.tensor([delete_tokenmark_input(f.input_ids,tokenizer) for f in features], dtype=torch.long)
     # print ('after all input ids',all_input_ids[0])
-    all_attention_mask=torch.tensor([delete_tokenmarker_am(f.input_ids,tokenizer) for f in features], dtype=torch.long)
+    all_attention_mask=torch.tensor([delete_tokenmarker_am(input_ids,tokenizer) for input_ids in all_input_ids], dtype=torch.long)
     # print ('after all attention mask',all_attention_mask[0])
-    all_token_type_ids=torch.tensor([delete_tokenmaker_tokentypeids(f.input_ids,tokenizer) for f in features], dtype=torch.long)
+    all_token_type_ids=torch.tensor([delete_tokenmaker_tokentypeids(input_ids,tokenizer) for input_ids in all_input_ids], dtype=torch.long)
     # print ('after all token type ids',all_token_type_ids[0])
 
     if output_mode == "classification":
