@@ -541,20 +541,20 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False,testset='test'
         torch.distributed.barrier()  # Make sure only the first process in distributed training process the dataset, and the others will use the cache
 
     # Convert to Tensors and build dataset
-    # all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
+    all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
     # print ('before all input ids',all_input_ids[0])
     
-    # all_attention_mask = torch.tensor([f.attention_mask for f in features], dtype=torch.long)
+    all_attention_mask = torch.tensor([f.attention_mask for f in features], dtype=torch.long)
     # print ('before all am ',all_attention_mask[0])
-    # all_token_type_ids = torch.tensor([f.token_type_ids if type(f.token_type_ids)!=type(None) else [0]*len(f.attention_mask) for f in features], dtype=torch.long)
+    all_token_type_ids = torch.tensor([f.token_type_ids if type(f.token_type_ids)!=type(None) else [0]*len(f.attention_mask) for f in features], dtype=torch.long)
     # print ('before all token_type_ids ',all_token_type_ids[0])
     # all_token_ids=torch.tensor([find_token_id(f.input_ids,tokenizer) for f in features], dtype=torch.long)
     # print ('all token ids',all_token_ids[0])
-    all_input_ids=torch.tensor([f.input_ids for f in features], dtype=torch.long)
+    # all_input_ids=torch.tensor([f.input_ids for f in features], dtype=torch.long)
     # print ('after all input ids',all_input_ids[0])
-    all_attention_mask=torch.tensor(f.input_ids for f in features], dtype=torch.long)
+    # all_attention_mask=torch.tensor(f.input_ids for f in features], dtype=torch.long)
     # print ('after all attention mask',all_attention_mask[0])
-    all_token_type_ids=torch.tensor(f.input_ids for f in features], dtype=torch.long)
+    # all_token_type_ids=torch.tensor(f.input_ids for f in features], dtype=torch.long)
     # print ('after all token type ids',all_token_type_ids[0])
 
     if output_mode == "classification":
