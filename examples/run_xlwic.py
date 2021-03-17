@@ -324,13 +324,23 @@ def train(args, train_dataset, model, tokenizer):
                     if (
                         args.local_rank == -1 and args.evaluate_during_training
                     ):  # Only evaluate when single GPU otherwise metrics may not average well
-                        dev_results = evaluate(args, model, tokenizer,testset=args.devname)
-                        # results = evaluate(args, model, tokenizer,testset='test_hard')
-                        # results = evaluate(args, model, tokenizer,testset='test_easy')
-                        # results = evaluate(args, model, tokenizer)
-                        results=eval_predict(args,model,tokenizer,dev_result=str(dev_results['acc']),flag=args.taskflag)
-                        for key, value in results.items():
-                            tb_writer.add_scalar("eval_{}".format(key), value, global_step)
+                        if args.language=='trainall_lgtransfer':
+                            for lg_current in 'eu id zh ru ar ja tr fi de en ka ko kk ur bn 1k_de 1k_ru'.split(' '):
+                                dev_results = evaluate(args, model, tokenizer,testset=args.devname+'_'+lg_current+'2en')
+                                # results = evaluate(args, model, tokenizer,testset='test_hard')
+                                # results = evaluate(args, model, tokenizer,testset='test_easy')
+                                # results = evaluate(args, model, tokenizer)
+                                results=eval_predict(args,model,tokenizer,dev_result=str(dev_results['acc']),testset='test_'+lg_current+'2en',flag=args.taskflag)
+                                for key, value in results.items():
+                                    tb_writer.add_scalar("eval_{}".format(key), value, global_step)
+                        else:
+                            dev_results = evaluate(args, model, tokenizer,testset=args.devname)
+                            # results = evaluate(args, model, tokenizer,testset='test_hard')
+                            # results = evaluate(args, model, tokenizer,testset='test_easy')
+                            # results = evaluate(args, model, tokenizer)
+                            results=eval_predict(args,model,tokenizer,dev_result=str(dev_results['acc']),flag=args.taskflag)
+                            for key, value in results.items():
+                                tb_writer.add_scalar("eval_{}".format(key), value, global_step)
                     tb_writer.add_scalar("lr", scheduler.get_lr()[0], global_step)
                     tb_writer.add_scalar("loss", (tr_loss - logging_loss) / args.logging_steps, global_step)
                     logging_loss = tr_loss
