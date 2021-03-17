@@ -325,7 +325,7 @@ def train(args, train_dataset, model, tokenizer):
                         args.local_rank == -1 and args.evaluate_during_training
                     ):  # Only evaluate when single GPU otherwise metrics may not average well
                         if args.language=='trainall_lgtransfer':
-                            for lg_current in 'eu id zh ru ar ja tr fi de en ka ko kk ur bn 1k_de 1k_ru'.split(' '):
+                            for lg_current in 'eu id zh ru ar ja tr fi de ka ko kk ur bn 1k_de 1k_ru'.split(' '):
                                 dev_results = evaluate(args, model, tokenizer,testset=args.devname+'_'+lg_current+'2en')
                                 # results = evaluate(args, model, tokenizer,testset='test_hard')
                                 # results = evaluate(args, model, tokenizer,testset='test_easy')
