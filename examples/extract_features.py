@@ -531,10 +531,10 @@ def main():
     example_counter=0
     for examples in read_examples(args.input_file,args.batch_size):
         example_counter+=1
-        try:
-             print (examples)
-        except UnicodeEncodeError as e:
-            print (e)
+        # try:
+        #      print (examples)
+        # except UnicodeEncodeError as e:
+        #     print (e)
         print ('processed {0} examples'.format (str(args.batch_size*example_counter)))
         examples2embeds(examples,tokenizer,model,device,writer,args)
     writer.close()
