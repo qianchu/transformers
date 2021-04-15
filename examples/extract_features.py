@@ -346,7 +346,7 @@ def examples2embeds(examples,tokenizer,model,device,writer,args):
         average_layer_batch = sum(all_encoder_layers[layer_start:layer_end]) / (layer_end-layer_start)
         try:
             wembs_sent_batch=tokenemb2wemb(average_layer_batch.cpu().detach().numpy(),w2token_batch)
-        except RuntimeError as e:
+        except CUDA error as e:
             print (e)
             print (average_layer_batch)
             print (example)
