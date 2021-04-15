@@ -30,6 +30,7 @@ from torch.utils.data.distributed import DistributedSampler
 
 from transformers import *
 import numpy
+import sys
 
 logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(message)s', 
                     datefmt = '%m/%d/%Y %H:%M:%S',
@@ -343,7 +344,13 @@ def examples2embeds(examples,tokenizer,model,device,writer,args):
         layer_start,layer_end=int(args.layers.split('~')[0]),int(args.layers.split('~')[1])
         
         average_layer_batch = sum(all_encoder_layers[layer_start:layer_end]) / (layer_end-layer_start)
-        wembs_sent_batch=tokenemb2wemb(average_layer_batch.cpu().detach().numpy(),w2token_batch)
+        try:
+            wembs_sent_batch=tokenemb2wemb(average_layer_batch.cpu().detach().numpy(),w2token_batch)
+        except RuntimeError as e:
+            print (e)
+            print (average_layer_batch)
+            print (example)
+            sys.exit(1)
         for i,sent in enumerate(examples):
             sent=produce_key(sent)
 
