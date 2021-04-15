@@ -261,7 +261,7 @@ def read_examples(input_file,example_batch):
             if not line:
                 break
             line = line.strip().split('\t')[0]
-            if line == '':
+            if line == '' or len(line.split())>400:
                 continue
             examples.append(line)
     start=0
