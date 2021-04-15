@@ -233,7 +233,7 @@ def read_examples_bk(input_file,example_batch):
             if not line:
                 break
             line = line.strip().split('\t')[0]
-            if line=='':
+            if line=='' or len(line.split())>400:
                 continue
             text_a = line
             text_b = None
