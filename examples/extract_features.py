@@ -535,7 +535,6 @@ def main():
              print (examples)
         except UnicodeEncodeError as e:
             print (e)
-        print (examples)
         print ('processed {0} examples'.format (str(args.batch_size*example_counter)))
         examples2embeds(examples,tokenizer,model,device,writer,args)
     writer.close()
