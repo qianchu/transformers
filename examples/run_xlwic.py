@@ -46,7 +46,7 @@ from transformers import (
     get_linear_schedule_with_warmup,
     RobertaConfig, RobertaForSequenceClassification,RobertaTokenizer,RobertaForSequenceTokenClassification,
     XLMRobertaConfig, XLMRobertaForSequenceClassification,XLMRobertaTokenizer, XLMRobertaForSequenceTokenClassification
-
+    DebertaConfig, DebertaForSequenceClassification,DebertaTokenizer,DebertaForSequenceTokenClassification,
 )
 from transformers import glue_convert_examples_to_features as convert_examples_to_features
 from transformers import xlwic_compute_metrics as compute_metrics
@@ -72,6 +72,7 @@ MODEL_CLASSES = {
     "distilbert": (DistilBertConfig, DistilBertForSequenceClassification, DistilBertTokenizer),
     'xlm-r':(XLMRobertaConfig, XLMRobertaForSequenceTokenClassification,XLMRobertaTokenizer),
     'roberta':(RobertaConfig, RobertaForSequenceTokenClassification,RobertaTokenizer)
+    'deberta':(DebertaConfig, DebertaForSequenceTokenClassification,DebertaTokenizer)
 }
 
 def delete_tokenmark_input(input_ids,tokenizer):
