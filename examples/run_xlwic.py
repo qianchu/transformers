@@ -78,10 +78,11 @@ MODEL_CLASSES = {
 def delete_tokenmark_input(input_ids,tokenizer):
     input_id_new=[]
     del_num=0
-    token_pos_start_id=tokenizer.encode('[',add_special_tokens=False)[0]
-    token_pos_end_id=tokenizer.encode(']',add_special_tokens=False)[0]
+    token_pos_start_id=[tokenizer.encode('[',add_special_tokens=False)[0],tokenizer.encode(' [',add_special_tokens=False)[0]]
+    token_pos_end_id=[tokenizer.encode(']',add_special_tokens=False)[0],tokenizer.encode(' ]',add_special_tokens=False)[0]]
+    token_pos_start_end_id=set(token_pos_start_id+token_pos_end_id)
     for i,input_i in enumerate(input_ids):
-        if input_i not in [token_pos_start_id,token_pos_end_id]:
+        if input_i not in token_pos_start_end_id:
             input_id_new.append(input_i)
         else:
             del_num+=1
@@ -130,8 +131,9 @@ def set_seed(args):
         torch.cuda.manual_seed_all(args.seed)
 
 def find_token_id(input_id,tokenizer):
-    token_pos_start_id=tokenizer.encode('[',add_special_tokens=False)[0]
-    token_pos_end_id=tokenizer.encode(']')
+    token_pos_start_id=set([tokenizer.encode('[',add_special_tokens=False)[0],tokenizer.encode(' [',add_special_tokens=False)[0]])
+
+    # token_pos_end_id=tokenizer.encode(']')
     
     token_ids=[]
     token_ids_alter=[]
@@ -143,7 +145,7 @@ def find_token_id(input_id,tokenizer):
         if token_ids_alter==[]:
             token_ids_alter.append(i)
             # logger.info('first word alter',token_ids_alter)
-        if input_i ==token_pos_start_id:
+        if input_i in token_pos_start_id:
             token_ids.append(i+1)
             # logger.info("first word",token_ids)
         # elif input_i==token_pos_end_id:
