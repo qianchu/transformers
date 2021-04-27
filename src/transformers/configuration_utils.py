@@ -57,6 +57,7 @@ class PretrainedConfig(object):
 
     def __init__(self, **kwargs):
         # Attributes with defaults
+        self.return_dict = kwargs.pop("return_dict", True)
         self.output_attentions = kwargs.pop("output_attentions", False)
         self.output_hidden_states = kwargs.pop("output_hidden_states", False)
         self.use_cache = kwargs.pop("use_cache", True)  # Not used by all models
@@ -115,6 +116,13 @@ class PretrainedConfig(object):
                 logger.error("Can't set {} with value {} for {}".format(key, value, self))
                 raise err
 
+    @property
+    def use_return_dict(self) -> bool:
+        """
+        :obj:`bool`: Whether or not return :class:`~transformers.file_utils.ModelOutput` instead of tuples.
+        """
+        # If torchscript is set, force `return_dict=False` to avoid jit errors
+        return self.return_dict and not self.torchscript
     @property
     def num_labels(self):
         return len(self.id2label)

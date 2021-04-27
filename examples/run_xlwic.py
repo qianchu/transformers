@@ -293,7 +293,7 @@ def train(args, train_dataset, model, tokenizer):
             # print ('args.mode_type',args.model_type)
             if args.model_type != "distilbert":
                 inputs["token_type_ids"] = (
-                    batch[2] if args.model_type in ["bert"] else None
+                    batch[2] if args.model_type in ["bert","deberta"] else None
                 )  # XLM and DistilBERT don't use segment_ids
             # print ('token_type_ids',inputs["token_type_ids"])
             outputs = model(**inputs,token_ids=batch[4])
