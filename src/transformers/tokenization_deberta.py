@@ -105,6 +105,7 @@ class DebertaTokenizer(GPT2Tokenizer):
         add_prefix_space=False,
         **kwargs
     ):
+        self.add_prefix_space=add_prefix_space
         bos_token = AddedToken(bos_token, lstrip=False, rstrip=False) if isinstance(bos_token, str) else bos_token
         eos_token = AddedToken(eos_token, lstrip=False, rstrip=False) if isinstance(eos_token, str) else eos_token
         sep_token = AddedToken(sep_token, lstrip=False, rstrip=False) if isinstance(sep_token, str) else sep_token
