@@ -19,6 +19,8 @@ from typing import Optional
 from urllib.parse import urlparse
 from zipfile import ZipFile, is_zipfile
 from collections import OrderedDict, UserDict
+from typing import Any, BinaryIO, Dict, List, Optional, Tuple, Union
+
 
 
 import requests
