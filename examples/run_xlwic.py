@@ -71,7 +71,7 @@ MODEL_CLASSES = {
     "xlm": (XLMConfig, XLMForSequenceClassification, XLMTokenizer),
     "distilbert": (DistilBertConfig, DistilBertForSequenceClassification, DistilBertTokenizer),
     'xlm-r':(XLMRobertaConfig, XLMRobertaForSequenceTokenClassification,XLMRobertaTokenizer),
-    'roberta':(RobertaConfig, RobertaForSequenceTokenClassification,RobertaTokenizer)
+    'roberta':(RobertaConfig, RobertaForSequenceTokenClassification,RobertaTokenizer),
     'deberta':(DebertaConfig, DebertaForSequenceTokenClassification,DebertaTokenizer)
 }
 
