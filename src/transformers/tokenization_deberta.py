@@ -16,7 +16,7 @@
 
 from typing import List, Optional
 
-from .tokenization_utils import AddedToken
+from tokenizers import AddedToken
 import logging
 from .tokenization_gpt2 import GPT2Tokenizer
 
