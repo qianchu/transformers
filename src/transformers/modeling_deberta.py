@@ -904,8 +904,8 @@ class DebertaModel(DebertaPreTrainedModel):
         inputs_embeds=None,
         output_attentions=None,
         output_hidden_states=None,
-        return_dict=None,
     ):
+        return_dict=None
         output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
         output_hidden_states = (
             output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
@@ -1151,7 +1151,6 @@ class DebertaForSequenceClassification(DebertaPreTrainedModel):
         labels=None,
         output_attentions=None,
         output_hidden_states=None,
-        return_dict=None,
     ):
         r"""
         labels (:obj:`torch.LongTensor` of shape :obj:`(batch_size,)`, `optional`):
@@ -1159,6 +1158,7 @@ class DebertaForSequenceClassification(DebertaPreTrainedModel):
             config.num_labels - 1]`. If :obj:`config.num_labels == 1` a regression loss is computed (Mean-Square loss),
             If :obj:`config.num_labels > 1` a classification loss is computed (Cross-Entropy).
         """
+        return_dict=None
         return_dict = return_dict if return_dict is not None else self.config.use_return_dict
 
         outputs = self.deberta(
@@ -1256,7 +1256,6 @@ class DebertaForSequenceTokenClassification(DebertaPreTrainedModel):
         labels=None,
         output_attentions=None,
         output_hidden_states=None,
-        return_dict=None,
         token_ids=None
 
     ):
@@ -1266,6 +1265,8 @@ class DebertaForSequenceTokenClassification(DebertaPreTrainedModel):
             config.num_labels - 1]`. If :obj:`config.num_labels == 1` a regression loss is computed (Mean-Square loss),
             If :obj:`config.num_labels > 1` a classification loss is computed (Cross-Entropy).
         """
+        return_dict=None
+
         return_dict = return_dict if return_dict is not None else self.config.use_return_dict
 
         outputs = self.deberta(

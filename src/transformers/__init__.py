@@ -202,8 +202,6 @@ if is_torch_available():
         DebertaPreTrainedModel,
         DebertaModel,
         DebertaForSequenceClassification,
-        DebertaForTokenClassification,
-        DebertaForSequenceTokenLeftClassification,
         DebertaForSequenceTokenClassification,
         DEBERTA_PRETRAINED_MODEL_ARCHIVE_LIST,
     )
