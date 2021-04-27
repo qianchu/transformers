@@ -296,6 +296,7 @@ def train(args, train_dataset, model, tokenizer):
                     batch[2] if args.model_type in ["bert","deberta"] else None
                 )  # XLM and DistilBERT don't use segment_ids
             # print ('token_type_ids',inputs["token_type_ids"])
+            print ('token type ids',batch[2])
             outputs = model(**inputs,token_ids=batch[4])
             loss = outputs[0]  # model outputs are always tuple in transformers (see doc)
 
