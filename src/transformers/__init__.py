@@ -199,6 +199,7 @@ if is_torch_available():
     )
 
     from .modeling_deberta import (
+        DebertaPreTrainedModel,
         DebertaModel,
         DebertaForSequenceClassification,
         DebertaForTokenClassification,
