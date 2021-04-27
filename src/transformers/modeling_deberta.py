@@ -889,13 +889,13 @@ class DebertaModel(DebertaPreTrainedModel):
         """
         raise NotImplementedError("The prune function is not implemented in DeBERTa model.")
 
-    @add_start_docstrings_to_model_forward(DEBERTA_INPUTS_DOCSTRING.format("batch_size, sequence_length"))
-    @add_code_sample_docstrings(
-        tokenizer_class=_TOKENIZER_FOR_DOC,
-        checkpoint=_CHECKPOINT_FOR_DOC,
-        output_type=SequenceClassifierOutput,
-        config_class=_CONFIG_FOR_DOC,
-    )
+    # @add_start_docstrings_to_model_forward(DEBERTA_INPUTS_DOCSTRING.format("batch_size, sequence_length"))
+    # @add_code_sample_docstrings(
+    #     tokenizer_class=_TOKENIZER_FOR_DOC,
+    #     checkpoint=_CHECKPOINT_FOR_DOC,
+    #     output_type=SequenceClassifierOutput,
+    #     config_class=_CONFIG_FOR_DOC,
+    # )
     @add_start_docstrings_to_callable(DEBERTA_INPUTS_DOCSTRING)
     def forward(
         self,
