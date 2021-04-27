@@ -104,10 +104,57 @@ def is_torch_available():
 def is_tf_available():
     return _tf_available
 
+def add_code_sample_docstrings(
+    *docstr, tokenizer_class=None, checkpoint=None, output_type=None, config_class=None, mask=None
+):
+    def docstring_decorator(fn):
+        model_class = fn.__qualname__.split(".")[0]
+        is_tf_class = model_class[:2] == "TF"
+        doc_kwargs = dict(model_class=model_class, tokenizer_class=tokenizer_class, checkpoint=checkpoint)
+
+        if "SequenceClassification" in model_class:
+            code_sample = TF_SEQUENCE_CLASSIFICATION_SAMPLE if is_tf_class else PT_SEQUENCE_CLASSIFICATION_SAMPLE
+        elif "QuestionAnswering" in model_class:
+            code_sample = TF_QUESTION_ANSWERING_SAMPLE if is_tf_class else PT_QUESTION_ANSWERING_SAMPLE
+        elif "TokenClassification" in model_class:
+            code_sample = TF_TOKEN_CLASSIFICATION_SAMPLE if is_tf_class else PT_TOKEN_CLASSIFICATION_SAMPLE
+        elif "MultipleChoice" in model_class:
+            code_sample = TF_MULTIPLE_CHOICE_SAMPLE if is_tf_class else PT_MULTIPLE_CHOICE_SAMPLE
+        elif "MaskedLM" in model_class or model_class in ["FlaubertWithLMHeadModel", "XLMWithLMHeadModel"]:
+            doc_kwargs["mask"] = "[MASK]" if mask is None else mask
+            code_sample = TF_MASKED_LM_SAMPLE if is_tf_class else PT_MASKED_LM_SAMPLE
+        elif "LMHead" in model_class or "CausalLM" in model_class:
+            code_sample = TF_CAUSAL_LM_SAMPLE if is_tf_class else PT_CAUSAL_LM_SAMPLE
+        elif "Model" in model_class or "Encoder" in model_class:
+            code_sample = TF_BASE_MODEL_SAMPLE if is_tf_class else PT_BASE_MODEL_SAMPLE
+        else:
+            raise ValueError(f"Docstring can't be built for model {model_class}")
+
+        output_doc = _prepare_output_docstrings(output_type, config_class) if output_type is not None else ""
+        built_doc = code_sample.format(**doc_kwargs)
+        fn.__doc__ = (fn.__doc__ or "") + "".join(docstr) + output_doc + built_doc
+        return fn
+
+    return 
 
 def add_start_docstrings(*docstr):
     def docstring_decorator(fn):
         fn.__doc__ = "".join(docstr) + (fn.__doc__ if fn.__doc__ is not None else "")
+        return fn
+
+    return docstring_decorator
+    
+def add_start_docstrings_to_model_forward(*docstr):
+    def docstring_decorator(fn):
+        class_name = f":class:`~transformers.{fn.__qualname__.split('.')[0]}`"
+        intro = f"   The {class_name} forward method, overrides the :func:`__call__` special method."
+        note = r"""
+    .. note::
+        Although the recipe for forward pass needs to be defined within this function, one should call the
+        :class:`Module` instance afterwards instead of this since the former takes care of running the pre and post
+        processing steps while the latter silently ignores them.
+        """
+        fn.__doc__ = intro + note + "".join(docstr) + (fn.__doc__ if fn.__doc__ is not None else "")
         return fn
 
     return docstring_decorator
