@@ -54,6 +54,7 @@ from .configuration_utils import PretrainedConfig
 from .configuration_xlm import XLM_PRETRAINED_CONFIG_ARCHIVE_MAP, XLMConfig
 from .configuration_xlm_roberta import XLM_ROBERTA_PRETRAINED_CONFIG_ARCHIVE_MAP, XLMRobertaConfig
 from .configuration_xlnet import XLNET_PRETRAINED_CONFIG_ARCHIVE_MAP, XLNetConfig
+from .configuration_deberta import DEBERTA_PRETRAINED_CONFIG_ARCHIVE_MAP,DebertaConfig
 from .data import (
     DataProcessor,
     InputExample,
@@ -148,6 +149,7 @@ from .tokenization_utils import PreTrainedTokenizer
 from .tokenization_xlm import XLMTokenizer
 from .tokenization_xlm_roberta import XLMRobertaTokenizer
 from .tokenization_xlnet import SPIECE_UNDERLINE, XLNetTokenizer
+from .tokenization_deberta import DebertaTokenizer
 from .training_args import TrainingArguments
 
 
@@ -194,6 +196,15 @@ if is_torch_available():
         BertForSequenceTokenClassification,
         load_tf_weights_in_bert,
         BERT_PRETRAINED_MODEL_ARCHIVE_MAP,
+    )
+
+    from .modeling_deberta import (
+        DebertaModel,
+        DebertaForSequenceClassification,
+        DebertaForTokenClassification,
+        DebertaForSequenceTokenLeftClassification,
+        DebertaForSequenceTokenClassification,
+        DEBERTA_PRETRAINED_MODEL_ARCHIVE_LIST,
     )
     from .modeling_openai import (
         OpenAIGPTPreTrainedModel,
