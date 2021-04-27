@@ -31,11 +31,10 @@ from .file_utils import add_code_sample_docstrings, add_start_docstrings, add_st
 #     TokenClassifierOutput,
 # )
 from .modeling_utils import PreTrainedModel
-from .utils import logging
 from .configuration_deberta import DebertaConfig
 
 
-logger = logging.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 _CONFIG_FOR_DOC = "DebertaConfig"
 _TOKENIZER_FOR_DOC = "DebertaTokenizer"

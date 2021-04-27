@@ -17,11 +17,11 @@
 from typing import List, Optional
 
 from .tokenization_utils import AddedToken
-from .utils import logging
+import logging
 from .tokenization_gpt2 import GPT2Tokenizer
 
 
-logger = logging.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 VOCAB_FILES_NAMES = {"vocab_file": "vocab.json", "merges_file": "merges.txt"}
 
