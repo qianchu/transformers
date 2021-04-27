@@ -18,7 +18,7 @@ from .configuration_utils import PretrainedConfig
 import logging
 
 
-logger = logging.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 DEBERTA_PRETRAINED_CONFIG_ARCHIVE_MAP = {
     "microsoft/deberta-base": "https://huggingface.co/microsoft/deberta-base/resolve/main/config.json",
