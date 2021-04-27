@@ -383,12 +383,13 @@ class DebertaEncoder(nn.Module):
         self,
         hidden_states,
         attention_mask,
-        output_hidden_states=True,
-        output_attentions=False,
         query_states=None,
         relative_pos=None,
         return_dict=True,
+        output_hidden_states=True,
+        output_attentions=False
     ):
+        
         attention_mask = self.get_attention_mask(attention_mask)
         relative_pos = self.get_rel_pos(hidden_states, query_states, relative_pos)
 
@@ -902,10 +903,10 @@ class DebertaModel(DebertaPreTrainedModel):
         token_type_ids=None,
         position_ids=None,
         inputs_embeds=None,
-        output_attentions=None,
-        output_hidden_states=None,
     ):
         return_dict=None
+        output_attentions=None,
+        output_hidden_states=None,
         output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
         output_hidden_states = (
             output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
@@ -1149,9 +1150,9 @@ class DebertaForSequenceClassification(DebertaPreTrainedModel):
         position_ids=None,
         inputs_embeds=None,
         labels=None,
+    ):
         output_attentions=None,
         output_hidden_states=None,
-    ):
         r"""
         labels (:obj:`torch.LongTensor` of shape :obj:`(batch_size,)`, `optional`):
             Labels for computing the sequence classification/regression loss. Indices should be in :obj:`[0, ...,
@@ -1254,11 +1255,11 @@ class DebertaForSequenceTokenClassification(DebertaPreTrainedModel):
         position_ids=None,
         inputs_embeds=None,
         labels=None,
-        output_attentions=None,
-        output_hidden_states=None,
         token_ids=None
 
     ):
+        output_attentions=None,
+        output_hidden_states=None,
         r"""
         labels (:obj:`torch.LongTensor` of shape :obj:`(batch_size,)`, `optional`):
             Labels for computing the sequence classification/regression loss. Indices should be in :obj:`[0, ...,
