@@ -22,7 +22,7 @@ from torch import _softmax_backward_data, nn
 from torch.nn import CrossEntropyLoss
 
 from .activations import ACT2FN
-from .file_utils import add_code_sample_docstrings, add_start_docstrings, add_start_docstrings_to_model_forward
+from .file_utils import add_code_sample_docstrings, add_start_docstrings, add_start_docstrings_to_model_forward,add_start_docstrings_to_callable
 from .modeling_outputs import (
     BaseModelOutput,
     MaskedLMOutput,
@@ -896,6 +896,7 @@ class DebertaModel(DebertaPreTrainedModel):
         output_type=SequenceClassifierOutput,
         config_class=_CONFIG_FOR_DOC,
     )
+    @add_start_docstrings_to_callable(BERT_INPUTS_DOCSTRING)
     def forward(
         self,
         input_ids=None,
