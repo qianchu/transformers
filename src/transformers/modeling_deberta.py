@@ -1030,9 +1030,9 @@ class DebertaForMaskedLM(DebertaPreTrainedModel):
             token_type_ids=token_type_ids,
             position_ids=position_ids,
             inputs_embeds=inputs_embeds,
-            # output_attentions=output_attentions,
-            output_hidden_states=output_hidden_states,
-            return_dict=return_dict,
+            # # output_attentions=output_attentions,
+            # output_hidden_states=output_hidden_states,
+            # return_dict=return_dict,
         )
 
         sequence_output = outputs[0]
@@ -1169,9 +1169,9 @@ class DebertaForSequenceClassification(DebertaPreTrainedModel):
             attention_mask=attention_mask,
             position_ids=position_ids,
             inputs_embeds=inputs_embeds,
-            # output_attentions=output_attentions,
-            output_hidden_states=output_hidden_states,
-            return_dict=return_dict,
+            # # output_attentions=output_attentions,
+            # output_hidden_states=output_hidden_states,
+            # return_dict=return_dict,
         )
 
         encoder_layer = outputs[0]
@@ -1277,9 +1277,9 @@ class DebertaForSequenceTokenClassification(DebertaPreTrainedModel):
             attention_mask=attention_mask,
             position_ids=position_ids,
             inputs_embeds=inputs_embeds,
-            # output_attentions=output_attentions,
-            output_hidden_states=output_hidden_states,
-            return_dict=return_dict,
+            # # output_attentions=output_attentions,
+            # output_hidden_states=output_hidden_states,
+            # return_dict=return_dict,
         )
 
         try:
@@ -1383,9 +1383,9 @@ class DebertaForTokenClassification(DebertaPreTrainedModel):
             token_type_ids=token_type_ids,
             position_ids=position_ids,
             inputs_embeds=inputs_embeds,
-            # output_attentions=output_attentions,
-            output_hidden_states=output_hidden_states,
-            return_dict=return_dict,
+            # # output_attentions=output_attentions,
+            # output_hidden_states=output_hidden_states,
+            # return_dict=return_dict,
         )
 
         sequence_output = outputs[0]
@@ -1477,8 +1477,8 @@ class DebertaForQuestionAnswering(DebertaPreTrainedModel):
             position_ids=position_ids,
             inputs_embeds=inputs_embeds,
             # output_attentions=output_attentions,
-            output_hidden_states=output_hidden_states,
-            return_dict=return_dict,
+            # output_hidden_states=output_hidden_states,
+            # return_dict=return_dict,
         )
 
         sequence_output = outputs[0]
