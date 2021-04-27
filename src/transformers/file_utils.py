@@ -18,6 +18,8 @@ from hashlib import sha256
 from typing import Optional
 from urllib.parse import urlparse
 from zipfile import ZipFile, is_zipfile
+from collections import OrderedDict, UserDict
+
 
 import requests
 from filelock import FileLock
