@@ -21,17 +21,17 @@ import torch
 from torch import _softmax_backward_data, nn
 from torch.nn import CrossEntropyLoss
 
-from ...activations import ACT2FN
-from ...file_utils import add_code_sample_docstrings, add_start_docstrings, add_start_docstrings_to_model_forward
-from ...modeling_outputs import (
-    BaseModelOutput,
-    MaskedLMOutput,
-    QuestionAnsweringModelOutput,
-    SequenceClassifierOutput,
-    TokenClassifierOutput,
-)
-from ...modeling_utils import PreTrainedModel
-from ...utils import logging
+from .activations import ACT2FN
+from .file_utils import add_code_sample_docstrings, add_start_docstrings, add_start_docstrings_to_model_forward
+# from .modeling_outputs import (
+#     BaseModelOutput,
+#     MaskedLMOutput,
+#     QuestionAnsweringModelOutput,
+#     SequenceClassifierOutput,
+#     TokenClassifierOutput,
+# )
+from .modeling_utils import PreTrainedModel
+from .utils import logging
 from .configuration_deberta import DebertaConfig
 
 
