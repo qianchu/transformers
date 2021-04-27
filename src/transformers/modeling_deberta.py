@@ -896,7 +896,7 @@ class DebertaModel(DebertaPreTrainedModel):
         output_type=SequenceClassifierOutput,
         config_class=_CONFIG_FOR_DOC,
     )
-    @add_start_docstrings_to_callable(BERT_INPUTS_DOCSTRING)
+    @add_start_docstrings_to_callable(DEBERTA_INPUTS_DOCSTRING)
     def forward(
         self,
         input_ids=None,
