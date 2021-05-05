@@ -338,7 +338,7 @@ def train(args, train_dataset, model, tokenizer):
                                 for key, value in results.items():
                                     tb_writer.add_scalar("eval_{}".format(key), value, global_step)
                         else:
-                            dev_results = evaluate(args, model, tokenizer,testset=args.devname)
+                            dev_results = evaluate(args, model, tokenizer,testset=args.devname,flag=args.taskflag)
                             # results = evaluate(args, model, tokenizer,testset='test_hard')
                             # results = evaluate(args, model, tokenizer,testset='test_easy')
                             # results = evaluate(args, model, tokenizer)
@@ -380,7 +380,7 @@ def train(args, train_dataset, model, tokenizer):
     return global_step, tr_loss / global_step
 
 
-def evaluate(args, model, tokenizer, testset='test',prefix=""):
+def evaluate(args, model, tokenizer, testset='test',prefix="",flag='wic'):
     eval_task_names = (args.task_name,)
     eval_outputs_dirs = (args.output_dir,)
 
@@ -445,6 +445,9 @@ def evaluate(args, model, tokenizer, testset='test',prefix=""):
                 logger.info("  %s = %s", testset+'-'+key, str(result[key]))
                 writer.write("%s = %s\n" % (testset+'-'+key, str(result[key])))
 
+        with open(output_eval_file+str(results['acc'])+'.dev','w') as writer:
+            for pred in preds:
+                writer.write(str(label2output(pred,flag))+'\n')
     return results
 
 
