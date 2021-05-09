@@ -430,7 +430,9 @@ def evaluate(args, model, tokenizer, testset='test',prefix=""):
             for key in sorted(result.keys()):
                 logger.info("  %s = %s", testset+'-'+key, str(result[key]))
                 writer.write("%s = %s\n" % (testset+'-'+key, str(result[key])))
-
+        with open(output_eval_file+str(results['acc'])+'.dev','w') as writer:
+            for pred in preds:
+                writer.write(str(label2output(pred,flag))+'\n')
     return results
 
 
