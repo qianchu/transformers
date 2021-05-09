@@ -366,7 +366,7 @@ def train(args, train_dataset, model, tokenizer):
     return global_step, tr_loss / global_step
 
 
-def evaluate(args, model, tokenizer, testset='test',prefix=""):
+def evaluate(args, model, tokenizer, testset='test',prefix="",flag='wic'):
     eval_task_names = (args.task_name,)
     eval_outputs_dirs = (args.output_dir,)
 
