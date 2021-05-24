@@ -190,6 +190,7 @@ def find_token_id(input_id,tokenizer):
         sys.exit(1)
     assert len(token_ids)==2
     return token_ids
+
 def train(args, train_dataset, model, tokenizer):
     """ Train the model """
     if args.local_rank in [-1, 0]:
@@ -416,7 +417,7 @@ def evaluate(args, model, tokenizer, testset='test',prefix="",flag='wic'):
                 inputs = {"input_ids": batch[0], "attention_mask": batch[1], "labels": batch[3]}
                 if args.model_type != "distilbert":
                     inputs["token_type_ids"] = (
-                        batch[2] if args.model_type in ["bert"] else None
+                        batch[2] if args.model_type in ["bert","deberta"] else None
                     )  # XLM and DistilBERT don't use segment_ids
                 outputs = model(**inputs,token_ids=batch[4])
                 tmp_eval_loss, logits = outputs[:2]
@@ -487,7 +488,7 @@ def eval_predict(args, model, tokenizer, dev_result,testset='test',prefix="",fla
                 inputs = {"input_ids": batch[0], "attention_mask": batch[1], "labels": batch[3]}
                 if args.model_type != "distilbert":
                     inputs["token_type_ids"] = (
-                        batch[2] if args.model_type in ["bert"] else None
+                        batch[2] if args.model_type in ["bert","deberta"] else None
                     )  # XLM and DistilBERT don't use segment_ids
                 outputs = model(**inputs,token_ids=batch[4])
                 tmp_eval_loss, logits = outputs[:2]
